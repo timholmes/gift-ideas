@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-giftideas-dev-171606-authRole",
+      "UnauthRoleArn": "arn:aws:iam::538269325615:role/amplify-giftideas-dev-171606-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::538269325615:role/amplify-giftideas-dev-171606-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-giftideas-dev-171606-deployment",
+      "UnauthRoleName": "amplify-giftideas-dev-171606-unauthRole",
+      "StackName": "amplify-giftideas-dev-171606",
+      "StackId": "arn:aws:cloudformation:us-east-1:538269325615:stack/amplify-giftideas-dev-171606/982e2d80-3e7d-11ec-8dfe-0aa787410a71",
+      "AmplifyAppId": "d1o3ynia4eqdui"
+    },
+    "categories": {
+      "auth": {
+        "giftideas285af703": {}
+      }
+    }
+  }
+}
