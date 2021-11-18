@@ -15,24 +15,22 @@
       </div>
     </div>
   </div>
-  auth: 
-  <div><a class="nav-link" [routerLink]="['/login']">Login</a></div>
+  <div><a class="nav-link" *ngIf="!isAuthenticated" [routerLink]="['/login']">Login</a></div>
 </nav>
 <br>
 
 <div class="container-fluid">
-  <!-- <p *ngIf="isAuthenticated">
+  <p *ngIf="isAuthenticated">
     <span>Welcome!</span>
-  </p> -->
+  </p>
   <!-- <app-idea-list></app-idea-list> -->
 
 
-<amplify-authenticator>
-  <div>
-    My App
-    <amplify-sign-out></amplify-sign-out>
-  </div>
-</amplify-authenticator>
+  <amplify-authenticator>
+    <div>
+      <!-- <amplify-sign-out></amplify-sign-out> -->
+    </div>
+  </amplify-authenticator>
   
   <router-outlet></router-outlet>
 </div>
