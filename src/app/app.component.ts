@@ -11,7 +11,9 @@ export class AppComponent implements OnInit {
   isAuthenticated = false;
 
   ngOnInit(): void {
+
     Auth.currentAuthenticatedUser().then(user => {
+      console.log(user.attributes.email);
       console.log('authenticated? yes');
       this.isAuthenticated = true;
       // sessionStorage.setItem('isAuthenticated', 'true');

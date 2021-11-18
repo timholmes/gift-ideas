@@ -8,6 +8,8 @@ import { AppComponent } from './app.component';
 import { AmplifyUIAngularModule } from '@aws-amplify/ui-angular';
 import Amplify from 'aws-amplify';
 import awsconfig from '../aws-exports';
+import { IdeaListComponent } from './ideas/idea-list/idea-list.component';
+import { LogoutComponent } from './auth/logout/logout.component';
 
 
 /* Configure Amplify resources */
@@ -15,7 +17,9 @@ Amplify.configure(awsconfig);
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    IdeaListComponent,
+    LogoutComponent
   ],
   imports: [
     AmplifyUIAngularModule,

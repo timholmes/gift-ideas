@@ -9,7 +9,7 @@
       <div class="navbar-nav">
         <!-- <a class="nav-link active" aria-current="page" [routerLink]="'/home'">Home</a> -->
         <a class="nav-link" [routerLink]="'/profile'">Profile</a>
-        <a class="nav-link" [routerLink]="['/person/2/ideas']">Ideas</a>
+        <a class="nav-link" [routerLink]="['/ideas']">Ideas</a>
         <a class="nav-link" [routerLink]="['/relations']">Others Ideas</a>
         <!-- <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a> -->
       </div>
@@ -23,14 +23,14 @@
   <p *ngIf="isAuthenticated">
     <span>Welcome!</span>
   </p>
-  <!-- <app-idea-list></app-idea-list> -->
+
+  
+  <router-outlet></router-outlet>
 
 
   <amplify-authenticator>
     <div>
-      <!-- <amplify-sign-out></amplify-sign-out> -->
+      <amplify-sign-out></amplify-sign-out>
     </div>
   </amplify-authenticator>
-  
-  <router-outlet></router-outlet>
 </div>
