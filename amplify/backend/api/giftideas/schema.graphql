@@ -18,3 +18,9 @@ type Comment @model @key(name: "byPost", fields: ["postID", "content"]) {
   post: Post @connection(fields: ["postID"])
   content: String!
 }
+
+type Idea @model {
+  id: ID!
+  title: String!
+  description: String!
+}

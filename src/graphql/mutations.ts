@@ -11,13 +11,6 @@ export const createBlog = /* GraphQL */ `
       id
       name
       posts {
-        items {
-          id
-          title
-          blogID
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -34,13 +27,6 @@ export const updateBlog = /* GraphQL */ `
       id
       name
       posts {
-        items {
-          id
-          title
-          blogID
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -57,13 +43,6 @@ export const deleteBlog = /* GraphQL */ `
       id
       name
       posts {
-        items {
-          id
-          title
-          blogID
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -83,20 +62,10 @@ export const createPost = /* GraphQL */ `
       blog {
         id
         name
-        posts {
-          nextToken
-        }
         createdAt
         updatedAt
       }
       comments {
-        items {
-          id
-          postID
-          content
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -116,20 +85,10 @@ export const updatePost = /* GraphQL */ `
       blog {
         id
         name
-        posts {
-          nextToken
-        }
         createdAt
         updatedAt
       }
       comments {
-        items {
-          id
-          postID
-          content
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -149,20 +108,10 @@ export const deletePost = /* GraphQL */ `
       blog {
         id
         name
-        posts {
-          nextToken
-        }
         createdAt
         updatedAt
       }
       comments {
-        items {
-          id
-          postID
-          content
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -182,15 +131,6 @@ export const createComment = /* GraphQL */ `
         id
         title
         blogID
-        blog {
-          id
-          name
-          createdAt
-          updatedAt
-        }
-        comments {
-          nextToken
-        }
         createdAt
         updatedAt
       }
@@ -212,15 +152,6 @@ export const updateComment = /* GraphQL */ `
         id
         title
         blogID
-        blog {
-          id
-          name
-          createdAt
-          updatedAt
-        }
-        comments {
-          nextToken
-        }
         createdAt
         updatedAt
       }
@@ -242,19 +173,52 @@ export const deleteComment = /* GraphQL */ `
         id
         title
         blogID
-        blog {
-          id
-          name
-          createdAt
-          updatedAt
-        }
-        comments {
-          nextToken
-        }
         createdAt
         updatedAt
       }
       content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createIdea = /* GraphQL */ `
+  mutation CreateIdea(
+    $input: CreateIdeaInput!
+    $condition: ModelIdeaConditionInput
+  ) {
+    createIdea(input: $input, condition: $condition) {
+      id
+      title
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateIdea = /* GraphQL */ `
+  mutation UpdateIdea(
+    $input: UpdateIdeaInput!
+    $condition: ModelIdeaConditionInput
+  ) {
+    updateIdea(input: $input, condition: $condition) {
+      id
+      title
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteIdea = /* GraphQL */ `
+  mutation DeleteIdea(
+    $input: DeleteIdeaInput!
+    $condition: ModelIdeaConditionInput
+  ) {
+    deleteIdea(input: $input, condition: $condition) {
+      id
+      title
+      description
       createdAt
       updatedAt
     }

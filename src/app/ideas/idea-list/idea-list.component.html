@@ -1,1 +1,4 @@
-<p>idea-list works!</p>
+<b>Your Ideas</b>
+<ul class="list-group" *ngFor="let idea of ideas">
+    <li class="list-group-item">{{ idea.title }}</li>
+</ul>

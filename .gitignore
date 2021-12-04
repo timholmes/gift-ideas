@@ -9,7 +9,8 @@ amplify/backend/.temp
 build/
 dist/
 node_modules/
-aws-exports.js
+aws-exports*
+aws-exports.ts
 awsconfiguration.json
 amplifyconfiguration.json
 amplifyconfiguration.dart

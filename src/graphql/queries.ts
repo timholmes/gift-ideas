@@ -8,13 +8,6 @@ export const getBlog = /* GraphQL */ `
       id
       name
       posts {
-        items {
-          id
-          title
-          blogID
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -32,9 +25,6 @@ export const listBlogs = /* GraphQL */ `
       items {
         id
         name
-        posts {
-          nextToken
-        }
         createdAt
         updatedAt
       }
@@ -51,20 +41,10 @@ export const getPost = /* GraphQL */ `
       blog {
         id
         name
-        posts {
-          nextToken
-        }
         createdAt
         updatedAt
       }
       comments {
-        items {
-          id
-          postID
-          content
-          createdAt
-          updatedAt
-        }
         nextToken
       }
       createdAt
@@ -83,15 +63,6 @@ export const listPosts = /* GraphQL */ `
         id
         title
         blogID
-        blog {
-          id
-          name
-          createdAt
-          updatedAt
-        }
-        comments {
-          nextToken
-        }
         createdAt
         updatedAt
       }
@@ -108,15 +79,6 @@ export const getComment = /* GraphQL */ `
         id
         title
         blogID
-        blog {
-          id
-          name
-          createdAt
-          updatedAt
-        }
-        comments {
-          nextToken
-        }
         createdAt
         updatedAt
       }
@@ -136,14 +98,36 @@ export const listComments = /* GraphQL */ `
       items {
         id
         postID
-        post {
-          id
-          title
-          blogID
-          createdAt
-          updatedAt
-        }
         content
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getIdea = /* GraphQL */ `
+  query GetIdea($id: ID!) {
+    getIdea(id: $id) {
+      id
+      title
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listIdeas = /* GraphQL */ `
+  query ListIdeas(
+    $filter: ModelIdeaFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listIdeas(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        description
         createdAt
         updatedAt
       }
