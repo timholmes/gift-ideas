@@ -10,6 +10,9 @@ import { IdeaListComponent } from './ideas/idea-list/idea-list.component';
 import { LogoutComponent } from './auth/logout/logout.component';
 import { HomeComponent } from './home/home.component';
 import { IdeaCreateComponent } from './ideas/idea-create/idea-create.component';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { AuthGuard } from './auth/auth.guard';
 
 
 @NgModule({
@@ -23,9 +26,11 @@ import { IdeaCreateComponent } from './ideas/idea-create/idea-create.component';
   imports: [
     AmplifyUIAngularModule,
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    CommonModule,
+    FormsModule
   ],
-  providers: [],
+  providers: [AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
