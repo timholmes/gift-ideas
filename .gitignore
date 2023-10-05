@@ -33,3 +33,9 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+firebase-config.json
+google-services.json
+GoogleService-Info.plist
+android/app/build.gradle
+android/app/debug.keystore
+android/app/android-giftideas-upload.keystore
