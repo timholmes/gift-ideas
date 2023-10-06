@@ -39,3 +39,6 @@ GoogleService-Info.plist
 android/app/build.gradle
 android/app/debug.keystore
 android/app/android-giftideas-upload.keystore
+ui-debug.log
+firestore-debug.log
+firebase-debug.log

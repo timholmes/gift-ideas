@@ -6,17 +6,25 @@ import firebase from 'firebase/compat/app';
 
 
 export default function App() {
+
   const firebaseApp = firebase.initializeApp(firebaseConfig);
-  // const app = initializeApp(firebaseConfig);
-  // const auth = getAuth(app);
+
+
+  // ** does this work with native google sign in?
+  // const auth = getAuth(firebaseApp);
+  // connectAuthEmulator(auth, "http://127.0.0.1:9099");
 
   GoogleSignin.configure();
 
   // Somewhere in your code
   signIn = async () => {
     try {
+      console.log('has play');
       await GoogleSignin.hasPlayServices();
+      console.log('sign in');
       const userInfo = await GoogleSignin.signIn();
+      console.log('user info');
+      console.log(userInfo);
       setState({ userInfo });
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -30,6 +38,8 @@ export default function App() {
       }
     }
   };
+
+  console.log(this.state);
 
   return (
     <View style={styles.container}>
