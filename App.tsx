@@ -1,11 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 const firebaseConfig = require('./firebase-config.json').result.sdkConfig;
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, User, statusCodes } from '@react-native-google-signin/google-signin';
 import firebase from 'firebase/compat/app';
+import { useState } from 'react';
 
 
 export default function App() {
+  const [userInfo, setUserInfo] = useState<User>();
+
 
   const firebaseApp = firebase.initializeApp(firebaseConfig);
 
@@ -17,16 +20,18 @@ export default function App() {
   GoogleSignin.configure();
 
   // Somewhere in your code
-  signIn = async () => {
+  const signIn = async () => {
     try {
       console.log('has play');
       await GoogleSignin.hasPlayServices();
       console.log('sign in');
-      const userInfo = await GoogleSignin.signIn();
-      console.log('user info');
+      const firebaseUser: User = await GoogleSignin.signIn();
+      console.log('firebase user');
+      console.log(firebaseUser);
+      setUserInfo(firebaseUser);
       console.log(userInfo);
-      setState({ userInfo });
-    } catch (error) {
+      // console.log(state);
+    } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -39,11 +44,11 @@ export default function App() {
     }
   };
 
-  console.log(this.state);
+  // console.log(state);
 
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!!</Text>
+      <Text>Open up App.js to start working on your app!! {userInfo?.user.email}</Text>
       <Pressable onPress={signIn}><Text>Login</Text></Pressable>
       <StatusBar style="auto" />
     </View>
@@ -58,3 +63,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+function setState(arg0: { userInfo: import("@react-native-google-signin/google-signin").User; }) {
+  throw new Error('Function not implemented.');
+}
+
