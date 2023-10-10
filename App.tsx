@@ -5,7 +5,7 @@ import { Button, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
 import SignIn from './src/app/SignIn';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, User } from '@react-native-google-signin/google-signin';
 const firebaseConfig = require('./firebase-config.json').result.sdkConfig;
 
 
@@ -14,6 +14,7 @@ const { Navigator, Screen } = createNativeStackNavigator();
 export default function App({ navigation }: any) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
   
   // Listen to the Firebase Auth state and set the local state.
   useEffect(() => {
@@ -22,14 +23,19 @@ export default function App({ navigation }: any) {
     // });
     // return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
     GoogleSignin.configure();
-    GoogleSignin.isSignedIn()
-      .then(result => {
-        setIsSignedIn(result)
-      })
-      .catch((error) => {
-        console.log(error);
-        setHasError(true);
-      });
+
+
+    const handleSignIn = async () => {
+      const signedInReply = await GoogleSignin.isSignedIn()
+      setIsSignedIn(signedInReply)
+
+      const userInfo: User | null = await GoogleSignin.signInSilently()
+      // userInfo = await GoogleSignin.getCurrentUser();
+      setUserInfo(userInfo)
+      // console.log(userInfo);
+    }
+
+    handleSignIn();
 
   }, []);
   
