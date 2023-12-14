@@ -1,70 +1,133 @@
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
-import { Button, View } from 'react-native';
+import React from 'react';
+import { Button, Text, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
-import SignIn from './src/app/SignIn';
-import { GoogleSignin, User } from '@react-native-google-signin/google-signin';
-const firebaseConfig = require('./firebase-config.json').result.sdkConfig;
-
+// import SignIn from './src/app/SignIn';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
+type Context = {
+  signIn(): void;
+  signOut(): void;
+}
+const AuthContext = React.createContext<Context>({
+  signIn: function (): void {
+    console.log('initial');
+  },
+  signOut: function (): void {
+  }
+});
+
 export default function App({ navigation }: any) {
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [userInfo, setUserInfo] = useState<User | null>(null);
   
-  // Listen to the Firebase Auth state and set the local state.
-  useEffect(() => {
-    // const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
-    //   setIsSignedIn(!!user);
-    // });
-    // return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    GoogleSignin.configure();
+  const [state, dispatch] = React.useReducer(
+    (prevState: any, action: any) => {
+      console.log(`${new Date()} \n dispatch: ${JSON.stringify(action)} prevState: ${JSON.stringify(prevState)}`);
 
+      switch (action.type) {
+        case 'BOOTSTRAP_COMPLETE':
+          return {
+            ...prevState,
+            isLoading: false,
+          };
+        case 'SIGN_IN':
+          return {
+            ...prevState,
+            isSignedIn: true,
+            userInfo: action.userInfo
+          }
+        case 'SIGN_OUT':
+          return {
+            ...prevState,
+            isSignedIn: false,
+            userInfo: null
+          }
+      }
+    }, {
+      isLoading: true,
+      isSignedIn: false,
+      userInfo: null
+    });
 
-    const handleSignIn = async () => {
-      const signedInReply = await GoogleSignin.isSignedIn()
-      setIsSignedIn(signedInReply)
+  // re-initialize firebase auth state
+  React.useEffect(() => {
+    const bootstrapAsync = async () => {
+      GoogleSignin.configure();
+      // const isSignedInReply = await GoogleSignin.isSignedIn()
+      // const userInfo = await GoogleSignin.signInSilently()
 
-      const userInfo: User | null = await GoogleSignin.signInSilently()
-      // userInfo = await GoogleSignin.getCurrentUser();
-      setUserInfo(userInfo)
-      // console.log(userInfo);
+      //simulate not previously signed-in
+      dispatch({ type: 'BOOTSTRAP_COMPLETE', isSignedIn: false, userInfo: null })
     }
 
-    handleSignIn();
-
+    bootstrapAsync();
   }, []);
-  
-  if(isSignedIn) {
+
+  const authContext = React.useMemo(
+    () => ({
+      signIn: async () => {
+        console.log('click signin');
+        dispatch({ type: 'SIGN_IN', userInfo: { email: 'test@test.com' } })
+      },
+      signOut: () => dispatch({ type: 'SIGN_OUT' })
+    }), []
+  );
+
+
+  function SignInScreen() {
+    const { signIn } = React.useContext(AuthContext);
     return (
+      <>
+        <Text>{JSON.stringify(state)}</Text>
+        <Button title="Sign In" onPress={signIn}></Button>
+      </>
+    )
+  }
+
+  function SignOutScreen() {
+    const { signOut } = React.useContext(AuthContext);
+    return (
+      <>
+        <View style={{ paddingEnd: 10 }}>
+          <Button title="Sign Out" onPress={signOut} ></Button>
+        </View>
+      </>
+    )
+  }
+
+  let landingScreen = null;
+  if(false) {
+    landingScreen = <Screen name="Home" component={Home} />
+  } else {
+    landingScreen = <Screen name="SignInScreen" component={SignInScreen} />
+  }
+
+  return (
+    <AuthContext.Provider value={authContext}>
       <PaperProvider>
         <NavigationContainer>
-            <Navigator screenOptions={{ 
-                headerRight: () => (
-                  <View style={{ paddingEnd: 10 }}>
-                    <Button title="Sign Out" onPress={ () => {
-                      // firebase.auth().signOut();
-                    }} ></Button>
-                  </View>
-                )
-              }}>
-              <Screen name="Home" component={Home} />
+          <Navigator screenOptions={{
+            headerRight: () => (
+              <SignOutScreen></SignOutScreen>
+            )
+          }}>
+            {landingScreen}
           </Navigator>
         </NavigationContainer>
       </PaperProvider>
-    );
-  } else {
-    return (
-      <NavigationContainer>
-        <Navigator>
-          <Screen name="SignIn" component={SignIn}/>
-        </Navigator>
-      </NavigationContainer>
-    );
-  }
-  
+    </AuthContext.Provider>
+  );
+  // // } else {
+  //   return (
+  //     <NavigationContainer>
+  //       <Navigator>
+  //         <Screen name="SignIn" component={SignIn} />
+  //       </Navigator>
+  //     </NavigationContainer>
+  //   );
+  // }
+
 }
