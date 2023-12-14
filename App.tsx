@@ -9,13 +9,18 @@ import Home from './src/app/Home';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
+enum AuthenticationEvents {
+  BOOTSTRAP_COMPLETE,
+  SIGN_IN,
+  SIGN_OUT
+}
+
 type Context = {
   signIn(): void;
   signOut(): void;
 }
 const AuthContext = React.createContext<Context>({
   signIn: function (): void {
-    console.log('initial');
   },
   signOut: function (): void {
   }
@@ -28,18 +33,18 @@ export default function App({ navigation }: any) {
       console.log(`${new Date()} \n dispatch: ${JSON.stringify(action)} prevState: ${JSON.stringify(prevState)}`);
 
       switch (action.type) {
-        case 'BOOTSTRAP_COMPLETE':
+        case AuthenticationEvents.BOOTSTRAP_COMPLETE:
           return {
             ...prevState,
             isLoading: false,
           };
-        case 'SIGN_IN':
+        case AuthenticationEvents.SIGN_IN:
           return {
             ...prevState,
             isSignedIn: true,
             userInfo: action.userInfo
           }
-        case 'SIGN_OUT':
+        case AuthenticationEvents.SIGN_OUT:
           return {
             ...prevState,
             isSignedIn: false,
@@ -60,7 +65,7 @@ export default function App({ navigation }: any) {
       // const userInfo = await GoogleSignin.signInSilently()
 
       //simulate not previously signed-in
-      dispatch({ type: 'BOOTSTRAP_COMPLETE', isSignedIn: false, userInfo: null })
+      dispatch({ type: AuthenticationEvents.BOOTSTRAP_COMPLETE, isSignedIn: false, userInfo: null })
     }
 
     bootstrapAsync();
@@ -70,9 +75,9 @@ export default function App({ navigation }: any) {
     () => ({
       signIn: async () => {
         console.log('click signin');
-        dispatch({ type: 'SIGN_IN', userInfo: { email: 'test@test.com' } })
+        dispatch({ type: AuthenticationEvents.SIGN_IN, userInfo: { email: 'test@test.com' } })
       },
-      signOut: () => dispatch({ type: 'SIGN_OUT' })
+      signOut: () => dispatch({ type: AuthenticationEvents.SIGN_OUT })
     }), []
   );
 
@@ -99,7 +104,7 @@ export default function App({ navigation }: any) {
   }
 
   let landingScreen = null;
-  if(false) {
+  if(state.isSignedIn) {
     landingScreen = <Screen name="Home" component={Home} />
   } else {
     landingScreen = <Screen name="SignInScreen" component={SignInScreen} />
@@ -120,14 +125,5 @@ export default function App({ navigation }: any) {
       </PaperProvider>
     </AuthContext.Provider>
   );
-  // // } else {
-  //   return (
-  //     <NavigationContainer>
-  //       <Navigator>
-  //         <Screen name="SignIn" component={SignIn} />
-  //       </Navigator>
-  //     </NavigationContainer>
-  //   );
-  // }
 
 }
