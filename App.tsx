@@ -6,9 +6,13 @@ import { Button, Text, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
 // import SignIn from './src/app/SignIn';
+import { initializeApp, getApps, getApp, FirebaseApp } from '@firebase/app';
+import { GoogleAuthProvider } from '@firebase/auth';
+import firebaseConfig from './firebase-config.json';
 
+// import 'firebase/auth';
+let firebaseApp: FirebaseApp;
 const { Navigator, Screen } = createNativeStackNavigator();
-
 enum AuthenticationEvents {
   BOOTSTRAP_COMPLETE,
   SIGN_IN,
@@ -25,6 +29,21 @@ const AuthContext = React.createContext<Context>({
   signOut: function (): void {
   }
 });
+
+function initializeFirebaseApp() {
+  console.log(getApps().length == 0);
+
+  if(getApps().length == 0) {
+  // if (firebase && !firebase?.getApps().length) {
+    // firebase.initializeApp(firebaseConfig);
+    console.log('return apps');
+    return initializeApp(firebaseConfig.result.sdkConfig);
+  } else {
+    console.log('return app');
+    return getApp(); // if already initialized, use that one
+  }
+
+}
 
 export default function App({ navigation }: any) {
   
@@ -61,6 +80,9 @@ export default function App({ navigation }: any) {
   React.useEffect(() => {
     const bootstrapAsync = async () => {
       GoogleSignin.configure();
+      
+      console.log('effect');
+      firebaseApp = initializeFirebaseApp();
       // const isSignedInReply = await GoogleSignin.isSignedIn()
       // const userInfo = await GoogleSignin.signInSilently()
 
@@ -75,6 +97,34 @@ export default function App({ navigation }: any) {
     () => ({
       signIn: async () => {
         console.log('click signin');
+
+        let googleUser = null;
+        try {
+          googleUser = await GoogleSignin.signIn();
+        } catch (error) {
+          console.log(error);
+          throw new Error('Error logging in.  Check logs.')
+        }
+
+        // console.log(JSON.stringify(googleUser.idToken));
+
+        // const credential = firebase.auth(firebaseApp).GoogleAuthProvider.credential(googleUser.idToken);
+        // firebase.auth.
+        const p = GoogleAuthProvider.credential(googleUser.idToken)
+        // const c = p.credential(googleUser.idToken)
+        // const prov = new auth.GoogleAuthProvider
+        // auth.GoogleAuthProvider
+        // const cred = prov.credential(googleUser.idToken)
+        // const credential = provider
+
+        // let signInResult
+        // try {
+        //    signInResult = await firebaseApp.auth().signInWithCredential(credential);
+        // } catch (error) {
+        //   console.log('firebase login error');
+        // }
+        
+
         dispatch({ type: AuthenticationEvents.SIGN_IN, userInfo: { email: 'test@test.com' } })
       },
       signOut: () => dispatch({ type: AuthenticationEvents.SIGN_OUT })
