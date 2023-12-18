@@ -68,11 +68,12 @@ function Home() {
     // });
   // }
 
-  // useEffect(() => {
+  useEffect(() => {
     
-  //   // fetchUserInfo();
+    // fetchUserInfo();
+    // getAuth()
 
-  // }, []);
+  }, []);
 
   return (
     <View>

@@ -1,7 +1,7 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useReducer } from 'react';
 import { Button, Text, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
@@ -9,15 +9,16 @@ import Home from './src/app/Home';
 import { initializeApp, getApps, getApp, FirebaseApp } from '@firebase/app';
 import { GoogleAuthProvider, signInWithCredential, getAuth } from '@firebase/auth';
 import firebaseConfig from './firebase-config.json';
+import { AuthenticationEvents, authenticationReducer, initialState } from './src/app/Authentication';
 
 // import 'firebase/auth';
 let firebaseApp: FirebaseApp;
 const { Navigator, Screen } = createNativeStackNavigator();
-enum AuthenticationEvents {
-  BOOTSTRAP_COMPLETE,
-  SIGN_IN,
-  SIGN_OUT
-}
+// enum AuthenticationEvents {
+//   BOOTSTRAP_COMPLETE,
+//   SIGN_IN,
+//   SIGN_OUT
+// }
 
 type Context = {
   signIn(): void;
@@ -42,39 +43,38 @@ function initializeFirebaseApp() {
     console.log('return app');
     return getApp(); // if already initialized, use that one
   }
-
 }
 
 export default function App({ navigation }: any) {
-  
-  const [state, dispatch] = React.useReducer(
-    (prevState: any, action: any) => {
-      console.log(`${new Date()} \n dispatch: ${JSON.stringify(action)} prevState: ${JSON.stringify(prevState)}`);
+  const [state, dispatch]  = useReducer(authenticationReducer, initialState)
+  // const [state, dispatch] = React.useReducer(
+  //   (prevState: any, action: any) => {
+  //     console.log(`${new Date()} \n dispatch: ${JSON.stringify(action)} prevState: ${JSON.stringify(prevState)}`);
 
-      switch (action.type) {
-        case AuthenticationEvents.BOOTSTRAP_COMPLETE:
-          return {
-            ...prevState,
-            isLoading: false,
-          };
-        case AuthenticationEvents.SIGN_IN:
-          return {
-            ...prevState,
-            isSignedIn: true,
-            userInfo: action.userInfo
-          }
-        case AuthenticationEvents.SIGN_OUT:
-          return {
-            ...prevState,
-            isSignedIn: false,
-            userInfo: null
-          }
-      }
-    }, {
-      isLoading: true,
-      isSignedIn: false,
-      userInfo: null
-    });
+  //     switch (action.type) {
+  //       case AuthenticationEvents.BOOTSTRAP_COMPLETE:
+  //         return {
+  //           ...prevState,
+  //           isLoading: false,
+  //         };
+  //       case AuthenticationEvents.SIGN_IN:
+  //         return {
+  //           ...prevState,
+  //           isSignedIn: true,
+  //           userInfo: action.userInfo
+  //         }
+  //       case AuthenticationEvents.SIGN_OUT:
+  //         return {
+  //           ...prevState,
+  //           isSignedIn: false,
+  //           userInfo: null
+  //         }
+  //     }
+  //   }, {
+  //     isLoading: true,
+  //     isSignedIn: false,
+  //     userInfo: null
+  //   });
 
   // re-initialize firebase auth state
   React.useEffect(() => {
