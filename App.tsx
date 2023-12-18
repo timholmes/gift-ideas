@@ -7,7 +7,7 @@ import { PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
 // import SignIn from './src/app/SignIn';
 import { initializeApp, getApps, getApp, FirebaseApp } from '@firebase/app';
-import { GoogleAuthProvider } from '@firebase/auth';
+import { GoogleAuthProvider, signInWithCredential, getAuth } from '@firebase/auth';
 import firebaseConfig from './firebase-config.json';
 
 // import 'firebase/auth';
@@ -110,7 +110,8 @@ export default function App({ navigation }: any) {
 
         // const credential = firebase.auth(firebaseApp).GoogleAuthProvider.credential(googleUser.idToken);
         // firebase.auth.
-        const p = GoogleAuthProvider.credential(googleUser.idToken)
+        const provider = GoogleAuthProvider.credential(googleUser.idToken)
+        signInWithCredential(getAuth(), provider)
         // const c = p.credential(googleUser.idToken)
         // const prov = new auth.GoogleAuthProvider
         // auth.GoogleAuthProvider
@@ -125,7 +126,7 @@ export default function App({ navigation }: any) {
         // }
         
 
-        dispatch({ type: AuthenticationEvents.SIGN_IN, userInfo: { email: 'test@test.com' } })
+        dispatch({ type: AuthenticationEvents.SIGN_IN, userInfo: googleUser })
       },
       signOut: () => dispatch({ type: AuthenticationEvents.SIGN_OUT })
     }), []
