@@ -4,7 +4,10 @@ import { Text, View } from "react-native";
 import "firebase/compat/firestore";
 
 
-function Home() {
+function Home(props: any) {
+
+  console.log('*** ' + JSON.stringify(props));
+
   // const [userInfo, setUser] = useState<User | null>(null);
   // const [userData, setUserData ] = useState(null);
   // GoogleSignin.configure();
@@ -78,7 +81,7 @@ function Home() {
   return (
     <View>
       <Text>
-        Welcome, zzz.
+        Welcome, {props.userInfo.user.givenName}.
       </Text>
     </View>
   )
