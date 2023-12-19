@@ -9,8 +9,10 @@ import Home from './src/app/Home';
 import { initializeApp, getApps, getApp, FirebaseApp } from '@firebase/app';
 import { GoogleAuthProvider, signInWithCredential, getAuth } from '@firebase/auth';
 import firebaseConfig from './firebase-config.json';
+import {FirebaseUtils} from './src/app/FirebaseUtils';
 
-let firebaseApp: FirebaseApp;
+// let firebaseApp: FirebaseApp = FirebaseUtils.getInstance();
+
 const { Navigator, Screen } = createNativeStackNavigator();
 const initialState = {
   isLoading: true,
@@ -18,27 +20,13 @@ const initialState = {
   userInfo: {}
 }
 
-function initializeFirebaseApp() {
-  if (getApps().length == 0) {
-    return initializeApp(firebaseConfig.result.sdkConfig);
-  } else {
-    return getApp(); // if already initialized, use that one
-  }
-}
-
 export default function App({ navigation }: any) {
-  const [state, setState] = useState({
-    isLoading: true,
-    isSignedIn: false,
-    userInfo: {}
-  })
+  const [state, setState] = useState(initialState)
 
   // re-initialize firebase auth state
   React.useEffect(() => {
     const bootstrapAsync = async () => {
       GoogleSignin.configure();
-
-      firebaseApp = initializeFirebaseApp();
 
       setState(await bootstrapComplete());
     }
@@ -108,7 +96,7 @@ export default function App({ navigation }: any) {
       <NavigationContainer>
         <Navigator screenOptions={{
           headerRight: () => (
-            <SignOutScreen></SignOutScreen>
+            state.isSignedIn ? <SignOutScreen></SignOutScreen> : null
           )
         }}>
           {landingScreen}
