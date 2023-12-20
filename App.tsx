@@ -1,17 +1,13 @@
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useReducer, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Text, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
 // import SignIn from './src/app/SignIn';
-import { initializeApp, getApps, getApp, FirebaseApp } from '@firebase/app';
-import { GoogleAuthProvider, signInWithCredential, getAuth } from '@firebase/auth';
-import firebaseConfig from './firebase-config.json';
-import {FirebaseUtils} from './src/app/FirebaseUtils';
-
-// let firebaseApp: FirebaseApp = FirebaseUtils.getInstance();
+import { GoogleAuthProvider, getAuth, signInWithCredential } from '@firebase/auth';
+import { FirebaseUtils } from './src/app/FirebaseUtils';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 const initialState = {
@@ -25,31 +21,72 @@ export default function App({ navigation }: any) {
 
   // re-initialize firebase auth state
   React.useEffect(() => {
-    const bootstrapAsync = async () => {
-      GoogleSignin.configure();
+    // GoogleSignin.configure();
+    // console.log(await GoogleSignin.isSignedIn());
+    // setState({ ...initialState, isLoading: false });
 
-      setState(await bootstrapComplete());
-    }
-
-    bootstrapAsync();
+    bootstrap();
   }, []);
 
-  async function bootstrapComplete() {
-    return { ...initialState, isLoading: false }
+  async function bootstrap() {
+    FirebaseUtils.initialize();
+    GoogleSignin.configure();  // required - initializes the native config
+    
+    if(await GoogleSignin.isSignedIn()) {
+      console.log('User already signed in.');
+
+      let googleUser = null;
+      try {
+        googleUser = await GoogleSignin.getCurrentUser();
+      } catch(e) {
+        sendToLoginScreen();
+        return;
+      }
+
+      if(!googleUser?.idToken) {  // id token expired
+        sendToLoginScreen();
+        return;
+      }
+      try {
+        await FirebaseUtils.setupUser(googleUser?.idToken);
+      } catch(e) {
+        // TODO: graceful user message
+        console.error('Unable to setup the user that is signed in.', e);
+        // throw new Error('Unable to get the user that is signed in.')
+        setState({ ...initialState, isLoading: false });
+        return;
+      }
+
+      setState({...initialState, isLoading: false, isSignedIn: true, userInfo: googleUser })
+    } else {
+      setState({ ...initialState, isLoading: false });
+    }
+  }
+
+  function sendToLoginScreen() {
+    setState({ ...initialState, isLoading: false, isSignedIn: false });
   }
 
   async function signIn() {
     let googleUser = null;
     try {
       googleUser = await GoogleSignin.signIn();
-    } catch (error) {
-      console.log(error);
-      throw new Error('Error logging in.  Check logs.')
-    }
-    const provider = GoogleAuthProvider.credential(googleUser.idToken)
-    signInWithCredential(getAuth(), provider)
+    } catch (error: any) {  // code doesn't exist on 
+      // console.log(JSON.stringify(e));
+      if(error?.code == statusCodes.SIGN_IN_CANCELLED) {
+        console.log(error.message);
+        setState({ ...initialState, isLoading: false, isSignedIn: false })
+        return
+      }
 
-    setState({ ...initialState, userInfo: googleUser, isSignedIn: true })
+      console.log('There was an error signing in.', error.message);
+      // throw new Error('Error logging in.  Check logs.');
+    }
+    
+    googleUser = (googleUser == null) ? {} : googleUser;
+    await FirebaseUtils.setupUser(googleUser?.idToken);
+
+    setState({ ...initialState, isLoading: false, userInfo: googleUser, isSignedIn: true })
   }
 
   function signOut() {
