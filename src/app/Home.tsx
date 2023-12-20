@@ -1,80 +1,87 @@
-import { GoogleSignin, User } from "@react-native-google-signin/google-signin";
-import { useEffect, useState } from "react";
+import { doc, getDoc, getFirestore, FirestoreErrorCode, FirestoreError, collection, CollectionReference, getDocs, QuerySnapshot } from "firebase/firestore";
+import { useEffect } from "react";
 import { Text, View } from "react-native";
-import "firebase/compat/firestore";
+import { FirebaseUtils } from "./FirebaseUtils";
+import { FirebaseError } from "firebase/app";
 
+
+enum FirestoreErrorCodes {
+  PERMISSION_DENIED = 'permission-denied'
+}
 
 function Home(props: any) {
+  const firebaseApp = FirebaseUtils.initialize();
 
-  console.log('*** ' + JSON.stringify(props));
+  const fetchUserData = async () => {
+    const db = getFirestore(firebaseApp);
+    const docRef = doc(db, "users", props.userInfo.user.email)
 
-  // const [userInfo, setUser] = useState<User | null>(null);
-  // const [userData, setUserData ] = useState(null);
-  // GoogleSignin.configure();
+    let userDocument = null;
+    try {
+      userDocument = await getDoc(docRef) // do this to determine permission?
+    } catch (error: any) {
+      if(error instanceof FirebaseError && error.code == FirestoreErrorCodes.PERMISSION_DENIED) {
+        console.log('Permission denied accessing user document.');
+      }
+      return;
+    }
+    let ideasCollection: QuerySnapshot = await getDocs(collection(docRef, "ideas"));
 
-  // let firebaseApp: firebase.app.App;
-  
-  // if (!firebase.apps.length) {
-  //   // firebase.initializeApp(firebaseConfig);
-  //   firebaseApp = firebase.initializeApp(firebaseConfig)
-  // }else {
-  //   firebaseApp = firebase.app(); // if already initialized, use that one
-  // }
-  // const db: firebase.firestore.Firestore = firebaseApp.firestore()
-  
-  // const fetchUserInfo = async () => {
-
-  //   console.log('silent');
-  //   GoogleSignin.signInSilently()
-
-  //   console.log('fetching');
-  //   // const signedInReply = await GoogleSignin.isSignedIn()
-  //   let userInfo: User | null;
-  //   console.log('silent');
-  //   userInfo = await GoogleSignin.signInSilently()
-  //   console.log(`signed in ${JSON.stringify(await GoogleSignin.isSignedIn())}`);
-
-  //   console.log('current');
-  //   userInfo = await GoogleSignin.getCurrentUser();
-  //   console.log(`current user ${JSON.stringify(userInfo)}`);
-  //   setUser(userInfo)
-  //   fetchUserData(userInfo)
-  // }
-
-  // const fetchUserData = async (userInfo: User | null) => {
-  //   // const email = firebaseApp.auth().currentUser?.email
-  //   // const firebaseApp = firebase.initializeApp(firebaseConfig)
-  //   const db: firebase.firestore.Firestore = firebaseApp.firestore()
+    console.log(JSON.stringify(ideasCollection.size));
     
-  //   console.log(userInfo?.user.email);
-  //   const usersDoc = db.collection('users').doc('timdholmes@gmail.com');
 
-  //   try {
-  //     const user = await usersDoc.get();
+    // doc(colref)
 
-  //     console.log(`got user ${JSON.stringify(user)}`);
-  //   } catch(error) {
-  //     console.log('oops');
-  //     console.log(error);
-  //   }
-    // if(!user.data()) {
-    //   usersDoc.set({firstName: 'michael'})
+
+    // console.log(JSON.stringify(userDocument?.data()));
+    // const users = collection(db, 'users');
+    // const documentReference: DocumentReference = doc(collection(db, "users"), 'timdholmes@gmail.com');
+    // console.log(documentReference.id);
+
+    // const doc = getDoc(documentReference)
+
+    // JSON.stringify(doc)
+    // JSON.stringify((await getDoc(documentReference)).data())
+    // console.log(JSON.stringify(q));
+    // const querySnapshot = await getDocs(q);
+
+    // console.log(querySnapshot.size);
+    // querySnapshot.forEach((doc) => {
+    //   // doc.data() is never undefined for query doc snapshots
+    //   console.log('here');
+    //   console.log(doc.id, " => ", doc.data());
+    // });
+    // console.log(JSON.stringify(users));
+    // CollectionReference
+
+    // const usersDoc = db.collection('users').doc('timdholmes@gmail.com');
+    // try {
+    //   const user = await usersDoc.get();
+
+    //   console.log(`got user ${JSON.stringify(user)}`);
+    // } catch (error) {
+    //   console.log('oops');
+    //   console.log(error);
+    // }
+
+    // if (!user.data()) {
+    //   usersDoc.set({ firstName: 'michael' })
     // }
     // .then((querySnapshot) => {
-    //     console.log(querySnapshot.data());
+    //   console.log(querySnapshot.data());
     // })
     // .catch(e => {
-    //     console.log(e);
-    //     // https://stackoverflow.com/questions/67010415/send-catch-error-state-from-child-to-parent-and-show-message
-    //     console.log(e.message);
-    //     // setErrorMessage(e.message);
+    //   console.log(e);
+    //   // https://stackoverflow.com/questions/67010415/send-catch-error-state-from-child-to-parent-and-show-message
+    //   console.log(e.message);
+    //   // setErrorMessage(e.message);
     // });
-  // }
+  }
 
   useEffect(() => {
-    
+
     // fetchUserInfo();
-    // getAuth()
+    fetchUserData();
 
   }, []);
 

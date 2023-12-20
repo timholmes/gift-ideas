@@ -5,7 +5,6 @@ import { GoogleAuthProvider, getAuth, signInWithCredential, UserCredential } fro
 export class FirebaseUtils {
   
   static initialize(): FirebaseApp {
-    console.log(getApps().length);
     if (getApps().length == 0) {
       return initializeApp(firebaseConfig.result.sdkConfig);
     } else {
