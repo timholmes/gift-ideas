@@ -2,22 +2,31 @@ import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-si
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { Button, Text, View } from 'react-native';
-import { PaperProvider } from 'react-native-paper';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, MD2Colors, PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
 // import SignIn from './src/app/SignIn';
-import { GoogleAuthProvider, getAuth, signInWithCredential } from '@firebase/auth';
+import { GoogleAuthProvider, getAuth, signInWithCredential, connectAuthEmulator, initializeAuth } from 'firebase/auth';
 import { FirebaseUtils } from './src/app/FirebaseUtils';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 const initialState = {
   isLoading: true,
   isSignedIn: false,
-  userInfo: {}
+  userInfo: {},
+  userMessage: ''
 }
 
 export default function App({ navigation }: any) {
   const [state, setState] = useState(initialState)
+
+  // async function setupEmulators(auth: any) {
+  //   const authUrl = 'http://localhost:9099'
+  //   await fetch(authUrl)
+  //   console.log('done');
+  //   connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
+  //   // why? to make sure that emulator are loaded
+  // }
 
   // re-initialize firebase auth state
   React.useEffect(() => {
@@ -25,42 +34,68 @@ export default function App({ navigation }: any) {
     // console.log(await GoogleSignin.isSignedIn());
     // setState({ ...initialState, isLoading: false });
 
+    // const auth = getAuth();
+    // const auth = initializeAuth(FirebaseUtils.initialize())
+    // connectAuthEmulator(auth, "http://localhost:9099");
+    // setupEmulators(auth)
+
     bootstrap();
   }, []);
 
   async function bootstrap() {
-    FirebaseUtils.initialize();
-    GoogleSignin.configure();  // required - initializes the native config
+    const app = FirebaseUtils.initialize();
+    // GoogleSignin.configure();  // required - initializes the native config
     
-    if(await GoogleSignin.isSignedIn()) {
-      console.log('User already signed in.');
+    // if(await GoogleSignin.isSignedIn()) {
+    //   setState({...initialState, userMessage: 'Trying to re-authenticate with existing credentials.'});
 
-      let googleUser = null;
-      try {
-        googleUser = await GoogleSignin.getCurrentUser();
-      } catch(e) {
-        sendToLoginScreen();
-        return;
-      }
+    //   console.log('User already signed in.');
 
-      if(!googleUser?.idToken) {  // id token expired
-        sendToLoginScreen();
-        return;
-      }
-      try {
-        await FirebaseUtils.setupUser(googleUser?.idToken);
-      } catch(e) {
-        // TODO: graceful user message
-        console.error('Unable to setup the user that is signed in.', e);
-        // throw new Error('Unable to get the user that is signed in.')
-        setState({ ...initialState, isLoading: false });
-        return;
-      }
+    //   let googleUser = null;
+    //   try {
+    //     googleUser = await GoogleSignin.getCurrentUser();
+    //   } catch(e) {
+    //     sendToLoginScreen();
+    //     return;
+    //   }
 
-      setState({...initialState, isLoading: false, isSignedIn: true, userInfo: googleUser })
-    } else {
-      setState({ ...initialState, isLoading: false });
+    //   if(!googleUser?.idToken) {  // id token expired
+    //     sendToLoginScreen();
+    //     return;
+    //   }
+    //   console.log(JSON.stringify(googleUser));
+    try {
+      const auth = getAuth()
+
+      connectAuthEmulator(auth, "http://192.168.1.78:9099/")
+      console.log(getAuth().emulatorConfig);
+    } catch(e) {
+      console.error(e)
     }
+
+    // return;
+      try {
+        await FirebaseUtils.setupUser('{"sub": "abc1233", "email": "foo2@example.com", "email_verified": true}');
+      } catch(e: any) {
+        // TODO: graceful user message
+        if(e.code == 'auth/invalid-credential') {
+          setState({...initialState, userMessage: 'Session expired, you will need to login again.'});
+          await setTimeout
+          console.log('ID token is expired.  Sending to sign in page.');
+        } else {
+          console.error('Firebase login failed..', e);
+        }
+
+        // throw new Error('Unable to get the user that is signed in.')
+        setTimeout(sendToLoginScreen, 1500) // let error message show then redirect
+        return;
+      }
+
+      // re-login success
+      setState({...initialState, isLoading: false, isSignedIn: true, userInfo: {} });
+    // } else {
+    //   sendToLoginScreen();
+    // }
   }
 
   function sendToLoginScreen() {
@@ -124,6 +159,13 @@ export default function App({ navigation }: any) {
     landingScreen = <Screen name="Home">
       {(props) => <Home {...props} userInfo={state.userInfo} />}
     </Screen>
+  } else if(state.isLoading) {
+    landingScreen = <Screen name="Home">
+      {(props) => <View style={styles.centered}>
+          <ActivityIndicator animating={true} color={MD2Colors.red800} />
+          <Text>{ state.userMessage }</Text>
+        </View>}
+      </Screen>
   } else {
     landingScreen = <Screen name="SignInScreen" component={SignInScreen} />
   }
@@ -143,3 +185,11 @@ export default function App({ navigation }: any) {
   );
 
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+})
