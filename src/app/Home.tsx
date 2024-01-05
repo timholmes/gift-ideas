@@ -14,6 +14,7 @@ function Home(props: any) {
   const firebaseApp = FirebaseUtils.initialize();
 
   const fetchUserData = async () => {
+    console.log(props);
     const db = getFirestore(firebaseApp);
     const docRef = doc(db, "users", props.userInfo.user.email)
 
@@ -26,6 +27,7 @@ function Home(props: any) {
       }
       return;
     }
+
     let ideasCollection: QuerySnapshot = await getDocs(collection(docRef, "ideas"));
 
     console.log(JSON.stringify(ideasCollection.size));
@@ -41,7 +43,7 @@ function Home(props: any) {
   return (
     <View>
       <Text>
-        Welcome, {props.userInfo.user.givenName}.
+        Welcome, {props.userInfo.displayName}.
         <List.Item
           title="First Item"
           description="Item description"
