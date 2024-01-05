@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { FirebaseUtils } from './src/app/FirebaseUtils';
-import { getAuth,connectAuthEmulator, UserCredential, User } from 'firebase/auth';
+import { getAuth, connectAuthEmulator, UserCredential, User, Auth } from 'firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { ActivityIndicator, MD2Colors, PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
@@ -18,40 +18,47 @@ const initialState = {
   userMessage: ''
 }
 
+
+
 export default function App() {
   const [state, setState] = useState(initialState)
+  
+  async function setupEmulators() {
+    const app = FirebaseUtils.initialize();
+    let auth = getAuth()
+
+    // on hot reload - don't initialize if already initialized
+    if(!auth.emulatorConfig) {
+      const authUrl = 'http://localhost:9099'
+      await fetch(authUrl)
+      console.log('done');
+
+      try {
+        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
+      } catch(e: any) {
+        console.error(e);
+      }
+    }
+    // why? to make sure that emulator are loaded
+  }
 
 
-  // async function setupEmulators(auth: any) {
-  //   const authUrl = 'http://localhost:9099'
-  //   await fetch(authUrl)
-  //   console.log('done');
-  //   connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
-  //   // why? to make sure that emulator are loaded
-  // }
+  async function bootstrap() {
+    if (process.env.EXPO_PUBLIC_ENVIRONMENT == 'LOCAL') {
+      await setupEmulators();
+      await stubSignIn();
+    } else {
+      await attemptReSignIn();
+    }
+  }
 
   // re-initialize firebase auth state
   useEffect(() => {
-    // connectAuthEmulator(auth, "http://localhost:9099");
-    // setupEmulators(auth)
-
-    // console.log(process.env.EXPO_PUBLIC_ENVIRONMENT); // LOCAL
     bootstrap();
   }, []);
 
   async function stubSignIn() {
     console.log('stubbing sign in');
-
-    try {
-      const app = FirebaseUtils.initialize();
-      const auth = getAuth()
-
-      connectAuthEmulator(auth, "http://192.168.1.78:9099/")
-      // console.log(getAuth().emulatorConfig);
-    } catch (e) {
-      console.error(e)
-      return;
-    }
 
     let userCredential: UserCredential;
     try {
@@ -63,13 +70,13 @@ export default function App() {
         console.log('ID token is expired.  Sending to sign in page.');
       } else if (e.code == 'auth/network-request-failed') {
         setState({ ...initialState, userMessage: 'Error - Emulator not connected.' });
-      } 
+      }
       console.error('Firebase login failed..', e);
 
       setTimeout(sendToLoginScreen, 1500) // let error message show then redirect
       return;
     }
-console.log(userCredential.user);
+
     setState({ ...initialState, isLoading: false, userInfo: userCredential.user, isSignedIn: true })
   }
 
@@ -95,14 +102,6 @@ console.log(userCredential.user);
     showDoneLoading();
   }
 
-  async function bootstrap() {
-    if (process.env.EXPO_PUBLIC_ENVIRONMENT == 'LOCAL') {
-      await stubSignIn();
-    } else {
-      await attemptReSignIn();
-    }
-  }
-
   function showDoneLoading() {
     setState({ ...initialState, isLoading: false });
   }
@@ -116,7 +115,6 @@ console.log(userCredential.user);
     try {
       googleUser = await GoogleSignin.signIn();
     } catch (error: any) {  // code doesn't exist on 
-      // console.log(JSON.stringify(e));
       if (error?.code == statusCodes.SIGN_IN_CANCELLED) {
         console.log(error.message);
         setState({ ...initialState, isLoading: false, isSignedIn: false })
@@ -124,7 +122,6 @@ console.log(userCredential.user);
       }
 
       console.log('There was an error signing in.', error.message);
-      // throw new Error('Error logging in.  Check logs.');
     }
 
     googleUser = (googleUser == null) ? {} : googleUser;
@@ -165,13 +162,15 @@ console.log(userCredential.user);
 
   let landingScreen = null;
   if (state.isSignedIn) {
+
     landingScreen = <Screen name="Home">
       {(props) => <Home {...props} userInfo={state.userInfo} />}
     </Screen>
+
   } else if (state.isLoading) {
     landingScreen = <Screen name="Home">
 
-      {(props) => 
+      {(props) =>
         <View style={styles.centered}>
           <ActivityIndicator animating={true} color={MD2Colors.red800} />
           <Text>{state.userMessage}</Text>

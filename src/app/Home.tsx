@@ -14,9 +14,8 @@ function Home(props: any) {
   const firebaseApp = FirebaseUtils.initialize();
 
   const fetchUserData = async () => {
-    console.log(props);
     const db = getFirestore(firebaseApp);
-    const docRef = doc(db, "users", props.userInfo.user.email)
+    const docRef = doc(db, "users", props.userInfo.email)
 
     let userDocument = null;
     try {

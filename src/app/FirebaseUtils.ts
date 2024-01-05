@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import firebaseConfig from '../../firebase-config.json';
 import { GoogleAuthProvider, getAuth, signInWithCredential, UserCredential } from '@firebase/auth';
+import { Auth } from 'firebase/auth';
 
 export class FirebaseUtils {
   
@@ -16,5 +17,4 @@ export class FirebaseUtils {
     const provider = GoogleAuthProvider.credential(idToken)
     return signInWithCredential(getAuth(), provider)
   } 
-
 }
