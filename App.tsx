@@ -61,7 +61,7 @@ export default function App() {
 
     let userCredential: UserCredential;
     try {
-      userCredential = await FirebaseUtils.setupUser('{"sub": "abc1233", "email": "foo2@example.com", "email_verified": true }');
+      userCredential = await FirebaseUtils.setupUser('{"sub": "abc1233", "email": "test1@test.com", "email_verified": true }');
     } catch (e: any) {
       // TODO: graceful user message
       if (e.code == 'auth/invalid-credential') {
