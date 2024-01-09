@@ -7,6 +7,7 @@ import { getAuth, connectAuthEmulator, UserCredential, User, Auth } from 'fireba
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { ActivityIndicator, MD2Colors, PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
+import SignOut from './src/app/SignOut';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
@@ -129,32 +130,11 @@ export default function App() {
     setState({ ...initialState, isLoading: false, userInfo: googleUser, isSignedIn: true })
   }
 
-  function signOut() {
-    GoogleSignin.signOut()
-      .then(() => {
-        setState({ ...initialState, userInfo: {}, isSignedIn: false });
-      })
-      .catch((e) => {
-        console.error('Sign out failed.', e);
-        // TODO: show error to user
-      });
-  }
-
   function SignInScreen(props: any) {
     return (
       <>
         <Text>{JSON.stringify(state)}</Text>
         <Button title="Sign In" onPress={signIn}></Button>
-      </>
-    )
-  }
-
-  function SignOutScreen() {
-    return (
-      <>
-        <View style={{ paddingEnd: 10 }}>
-          <Button title="Sign Out" onPress={signOut} ></Button>
-        </View>
       </>
     )
   }
@@ -181,12 +161,23 @@ export default function App() {
     landingScreen = <Screen name="SignInScreen" component={SignInScreen} />
   }
 
+  function handleSignOut(success: boolean, error: Error) {
+    console.log('handling sign out ' + success);
+    
+    if(success && !error) {
+      setState({ ...initialState, userInfo: {}, isSignedIn: false, isLoading: false });
+    } else {
+      setState({ ...initialState, userInfo: {}, isSignedIn: false, isLoading: false, userMessage: 'Sign-out failed.' });
+    }
+    return;
+  }
+
   return (
     <PaperProvider>
       <NavigationContainer>
         <Navigator screenOptions={{
           headerRight: () => (
-            state.isSignedIn ? <SignOutScreen></SignOutScreen> : null
+            state.isSignedIn ? <SignOut signOutListener={handleSignOut}></SignOut> : null
           )
         }}>
           {landingScreen}
