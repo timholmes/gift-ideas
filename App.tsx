@@ -8,6 +8,7 @@ import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-si
 import { ActivityIndicator, MD2Colors, PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
 import SignOut, { SignOutEvents } from './src/app/SignOut';
+import LoadingOverlay from './src/app/LoadingOverlay';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
@@ -56,10 +57,11 @@ export default function App() {
   useEffect(() => {
     bootstrap();
     DeviceEventEmitter.addListener(SignOutEvents.SIGN_OUT_COMPLETE, (eventData) => { handleSignOut(eventData) })
-    
+
     return () => {
       DeviceEventEmitter.removeAllListeners(SignOutEvents.SIGN_OUT_COMPLETE);
     };
+
   }, []);
 
   async function stubSignIn() {
@@ -146,23 +148,14 @@ export default function App() {
 
   let landingScreen = null;
   if (state.isSignedIn) {
-
     landingScreen = <Screen name="Home">
-      {
-        (props) => <Home {...props} userInfo={state.userInfo} />
-      }
+      { (props) => <Home {...props} userInfo={state.userInfo} /> }
     </Screen>
-
   } else if (state.isLoading) {
     landingScreen = <Screen name="Home">
-
       {(props) =>
-        <View style={styles.centered}>
-          <ActivityIndicator animating={true} color={MD2Colors.red800} />
-          <Text>{state.userMessage}</Text>
-        </View>
+        <LoadingOverlay {...props} />
       }
-
     </Screen>
   } else {
     landingScreen = <Screen name="SignInScreen" component={SignInScreen} />
@@ -200,11 +193,3 @@ export default function App() {
     </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-});
