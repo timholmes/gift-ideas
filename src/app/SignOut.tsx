@@ -1,22 +1,33 @@
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { Button, View } from "react-native";
+import { useEffect } from "react";
+import { Button, DeviceEventEmitter, View } from "react-native";
 
+
+export enum SignOutEvents {
+    SIGN_OUT_COMPLETE = "event.onSignOut"
+}
 
 export default function SignOut({ signOutListener }: any) {
+
+    useEffect(() => {
+        return () => {
+            DeviceEventEmitter.removeAllListeners(SignOutEvents.SIGN_OUT_COMPLETE);
+        };
+    }, []);
 
     function signOut() {
         console.log('signout method');
 
         GoogleSignin.signOut()
         .then(() => {
-            signOutListener(true, null);
+            DeviceEventEmitter.emit(SignOutEvents.SIGN_OUT_COMPLETE, { success: true } );
+            // signOutListener(true, null);
         })
         .catch((e) => {
-            signOutListener(false, e)
+            DeviceEventEmitter.emit(SignOutEvents.SIGN_OUT_COMPLETE, { success: false, error: e } );
+            // signOutListener(false, e)
             console.error('Sign out failed.', e);
         });
-
-        signOutListener(true)
     }
 
     return (

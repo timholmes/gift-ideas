@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, DeviceEventEmitter, StyleSheet, Text, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
@@ -7,7 +7,7 @@ import { getAuth, connectAuthEmulator, UserCredential, User, Auth } from 'fireba
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { ActivityIndicator, MD2Colors, PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
-import SignOut from './src/app/SignOut';
+import SignOut, { SignOutEvents } from './src/app/SignOut';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
@@ -55,6 +55,11 @@ export default function App() {
   // re-initialize firebase auth state
   useEffect(() => {
     bootstrap();
+    DeviceEventEmitter.addListener(SignOutEvents.SIGN_OUT_COMPLETE, (eventData) => { handleSignOut(eventData) })
+    
+    return () => {
+      DeviceEventEmitter.removeAllListeners(SignOutEvents.SIGN_OUT_COMPLETE);
+    };
   }, []);
 
   async function stubSignIn() {
@@ -143,7 +148,9 @@ export default function App() {
   if (state.isSignedIn) {
 
     landingScreen = <Screen name="Home">
-      {(props) => <Home {...props} userInfo={state.userInfo} />}
+      {
+        (props) => <Home {...props} userInfo={state.userInfo} />
+      }
     </Screen>
 
   } else if (state.isLoading) {
@@ -161,10 +168,8 @@ export default function App() {
     landingScreen = <Screen name="SignInScreen" component={SignInScreen} />
   }
 
-  function handleSignOut(success: boolean, error: Error) {
-    console.log('handling sign out ' + success);
-    
-    if(success && !error) {
+  function handleSignOut(eventData: any) {
+    if(eventData.success && !eventData.error) {
       setState({ ...initialState, userInfo: {}, isSignedIn: false, isLoading: false });
     } else {
       setState({ ...initialState, userInfo: {}, isSignedIn: false, isLoading: false, userMessage: 'Sign-out failed.' });
@@ -172,14 +177,23 @@ export default function App() {
     return;
   }
 
+
   return (
     <PaperProvider>
       <NavigationContainer>
-        <Navigator screenOptions={{
-          headerRight: () => (
-            state.isSignedIn ? <SignOut signOutListener={handleSignOut}></SignOut> : null
-          )
-        }}>
+        <Navigator 
+          screenOptions={{
+            headerRight: () => (
+              state.isSignedIn ? <SignOut></SignOut> : null
+            )
+          }}
+          screenListeners={{
+            state: (e) => {
+              // Do something with the state
+              console.log('state changed', e.data);
+            },
+          }}
+        >
           {landingScreen}
         </Navigator>
       </NavigationContainer>

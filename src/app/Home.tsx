@@ -31,8 +31,6 @@ function Home(props: any) {
   }
 
   useEffect(() => {
-
-    // fetchUserInfo();
     fetchUserData();
 
   }, []);
