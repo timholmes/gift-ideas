@@ -9,6 +9,7 @@ import { ActivityIndicator, MD2Colors, PaperProvider } from 'react-native-paper'
 import Home from './src/app/Home';
 import SignOut, { SignOutEvents } from './src/app/SignOut';
 import LoadingOverlay from './src/app/LoadingOverlay';
+import SignIn, { SignInEvents } from './src/app/SignIn';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
@@ -24,32 +25,34 @@ const initialState = {
 export default function App() {
   const [state, setState] = useState(initialState)
   
-  async function setupEmulators() {
-    const app = FirebaseUtils.initialize();
-    let auth = getAuth()
+  // async function setupEmulators() {
+  //   const app = FirebaseUtils.initialize();
+  //   let auth = getAuth()
 
-    // on hot reload - don't initialize if already initialized
-    if(!auth.emulatorConfig) {
-      const authUrl = 'http://localhost:9099'
-      await fetch(authUrl)
-      console.log('done');
+  //   // on hot reload - don't initialize if already initialized
+  //   if(!auth.emulatorConfig) {
+  //     const authUrl = 'http://localhost:9099'
+  //     await fetch(authUrl)
+  //     console.log('done');
 
-      try {
-        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
-      } catch(e: any) {
-        console.error(e);
-      }
-    }
-    // why? to make sure that emulator are loaded
-  }
+  //     try {
+  //       connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
+  //     } catch(e: any) {
+  //       console.error(e);
+
+  //     }
+  //   }
+  //   // why? to make sure that emulator are loaded
+  // }
 
 
   async function bootstrap() {
     if (process.env.EXPO_PUBLIC_ENVIRONMENT == 'LOCAL') {
-      await setupEmulators();
-      await stubSignIn();
+      // await setupEmulators();
+      sendToLoginScreen()
+      // await stubSignIn();
     } else {
-      await attemptReSignIn();
+      // await attemptReSignIn();
     }
   }
 
@@ -57,57 +60,36 @@ export default function App() {
   useEffect(() => {
     bootstrap();
     DeviceEventEmitter.addListener(SignOutEvents.SIGN_OUT_COMPLETE, (eventData) => { handleSignOut(eventData) })
-
+    DeviceEventEmitter.addListener(SignInEvents.SIGN_IN_COMPLETE, (eventData) => { handleSignIn(eventData) })
+    
     return () => {
-      DeviceEventEmitter.removeAllListeners(SignOutEvents.SIGN_OUT_COMPLETE);
+      DeviceEventEmitter.removeAllListeners();
     };
 
   }, []);
 
-  async function stubSignIn() {
-    console.log('stubbing sign in');
+  // async function stubSignIn() {
+  //   console.log('stubbing sign in');
 
-    let userCredential: UserCredential;
-    try {
-      userCredential = await FirebaseUtils.setupUser('{"sub": "abc1233", "email": "test1@test.com", "email_verified": true }');
-    } catch (e: any) {
-      // TODO: graceful user message
-      if (e.code == 'auth/invalid-credential') {
-        setState({ ...initialState, userMessage: 'Session expired, you will need to login again.' });
-        console.log('ID token is expired.  Sending to sign in page.');
-      } else if (e.code == 'auth/network-request-failed') {
-        setState({ ...initialState, userMessage: 'Error - Emulator not connected.' });
-      }
-      console.error('Firebase login failed..', e);
+  //   let userCredential: UserCredential;
+  //   try {
+  //     userCredential = await FirebaseUtils.setupUser('{"sub": "abc1233", "email": "test1@test.com", "email_verified": true }');
+  //   } catch (e: any) {
+  //     // TODO: graceful user message
+  //     if (e.code == 'auth/invalid-credential') {
+  //       setState({ ...initialState, userMessage: 'Session expired, you will need to login again.' });
+  //       console.log('ID token is expired.  Sending to sign in page.');
+  //     } else if (e.code == 'auth/network-request-failed') {
+  //       setState({ ...initialState, userMessage: 'Error - Emulator not connected.' });
+  //     }
+  //     console.error('Firebase login failed..', e);
 
-      setTimeout(sendToLoginScreen, 1500) // let error message show then redirect
-      return;
-    }
+  //     setTimeout(sendToLoginScreen, 1500) // let error message show then redirect
+  //     return;
+  //   }
 
-    setState({ ...initialState, isLoading: false, userInfo: userCredential.user, isSignedIn: true })
-  }
-
-  async function attemptReSignIn() {
-    if (await GoogleSignin.isSignedIn()) {
-      setState({ ...initialState, userMessage: 'Trying to re-authenticate with existing credentials.' });
-      console.log('User already signed in.');
-
-      let googleUser = null;
-      try {
-        googleUser = await GoogleSignin.getCurrentUser();
-      } catch (e) {
-        sendToLoginScreen();
-        return;
-      }
-
-      if (!googleUser?.idToken) {  // id token expired
-        sendToLoginScreen();
-        return;
-      }
-    }
-
-    showDoneLoading();
-  }
+  //   setState({ ...initialState, isLoading: false, userInfo: userCredential.user, isSignedIn: true })
+  // }
 
   function showDoneLoading() {
     setState({ ...initialState, isLoading: false });
@@ -117,33 +99,13 @@ export default function App() {
     setState({ ...initialState, isLoading: false, isSignedIn: false });
   }
 
-  async function signIn() {
-    let googleUser = null;
-    try {
-      googleUser = await GoogleSignin.signIn();
-    } catch (error: any) {  // code doesn't exist on 
-      if (error?.code == statusCodes.SIGN_IN_CANCELLED) {
-        console.log(error.message);
-        setState({ ...initialState, isLoading: false, isSignedIn: false })
-        return
-      }
+  async function handleSignIn(eventData: any) {
 
-      console.log('There was an error signing in.', error.message);
+    if(eventData.success == false) {
+      setState({ ...initialState, isLoading: false, isSignedIn: false })
+    } else {
+      setState({ ...initialState, isLoading: false, userInfo: eventData.userInfo, isSignedIn: true })
     }
-
-    googleUser = (googleUser == null) ? {} : googleUser;
-    await FirebaseUtils.setupUser(googleUser?.idToken);
-
-    setState({ ...initialState, isLoading: false, userInfo: googleUser, isSignedIn: true })
-  }
-
-  function SignInScreen(props: any) {
-    return (
-      <>
-        <Text>{JSON.stringify(state)}</Text>
-        <Button title="Sign In" onPress={signIn}></Button>
-      </>
-    )
   }
 
   let landingScreen = null;
@@ -158,7 +120,7 @@ export default function App() {
       }
     </Screen>
   } else {
-    landingScreen = <Screen name="SignInScreen" component={SignInScreen} />
+    landingScreen = <Screen name="Sign In" component={SignIn} />
   }
 
   function handleSignOut(eventData: any) {
@@ -183,7 +145,7 @@ export default function App() {
           screenListeners={{
             state: (e) => {
               // Do something with the state
-              console.log('state changed', e.data);
+              // console.log('state changed', e.data);
             },
           }}
         >

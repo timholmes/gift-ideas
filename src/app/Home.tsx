@@ -11,6 +11,7 @@ enum FirestoreErrorCodes {
 }
 
 function Home(props: any) {
+
   const fetchUserData = async () => {
     const db = FirebaseUtils.getFirestoreDatbase();
     const docRef = doc(db, "users", props.userInfo.email)
@@ -38,7 +39,7 @@ function Home(props: any) {
   return (
     <View>
       <Text>
-        Welcome, {props.userInfo.displayName}.
+        Welcome, {props.userInfo.firstName}.
       </Text>
       <Ideas></Ideas>
     </View>
