@@ -1,15 +1,14 @@
-import { Button, DeviceEventEmitter, StyleSheet, Text, View } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
-import { FirebaseUtils } from './src/app/FirebaseUtils';
-import { getAuth, connectAuthEmulator, UserCredential, User, Auth } from 'firebase/auth';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import { ActivityIndicator, MD2Colors, PaperProvider } from 'react-native-paper';
+import { DeviceEventEmitter } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
 import Home from './src/app/Home';
-import SignOut, { SignOutEvents } from './src/app/SignOut';
 import LoadingOverlay from './src/app/LoadingOverlay';
 import SignIn, { SignInEvents } from './src/app/SignIn';
+import SignOut, { SignOutEvents } from './src/app/SignOut';
+import { FirebaseUtils } from './src/app/FirebaseUtils';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
@@ -24,33 +23,10 @@ const initialState = {
 
 export default function App() {
   const [state, setState] = useState(initialState)
-  
-  // async function setupEmulators() {
-  //   const app = FirebaseUtils.initialize();
-  //   let auth = getAuth()
-
-  //   // on hot reload - don't initialize if already initialized
-  //   if(!auth.emulatorConfig) {
-  //     const authUrl = 'http://localhost:9099'
-  //     await fetch(authUrl)
-  //     console.log('done');
-
-  //     try {
-  //       connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
-  //     } catch(e: any) {
-  //       console.error(e);
-
-  //     }
-  //   }
-  //   // why? to make sure that emulator are loaded
-  // }
-
 
   async function bootstrap() {
     if (process.env.EXPO_PUBLIC_ENVIRONMENT == 'LOCAL') {
-      // await setupEmulators();
-      sendToLoginScreen()
-      // await stubSignIn();
+      await FirebaseUtils.stubSignIn();
     } else {
       // await attemptReSignIn();
     }
@@ -68,39 +44,7 @@ export default function App() {
 
   }, []);
 
-  // async function stubSignIn() {
-  //   console.log('stubbing sign in');
-
-  //   let userCredential: UserCredential;
-  //   try {
-  //     userCredential = await FirebaseUtils.setupUser('{"sub": "abc1233", "email": "test1@test.com", "email_verified": true }');
-  //   } catch (e: any) {
-  //     // TODO: graceful user message
-  //     if (e.code == 'auth/invalid-credential') {
-  //       setState({ ...initialState, userMessage: 'Session expired, you will need to login again.' });
-  //       console.log('ID token is expired.  Sending to sign in page.');
-  //     } else if (e.code == 'auth/network-request-failed') {
-  //       setState({ ...initialState, userMessage: 'Error - Emulator not connected.' });
-  //     }
-  //     console.error('Firebase login failed..', e);
-
-  //     setTimeout(sendToLoginScreen, 1500) // let error message show then redirect
-  //     return;
-  //   }
-
-  //   setState({ ...initialState, isLoading: false, userInfo: userCredential.user, isSignedIn: true })
-  // }
-
-  function showDoneLoading() {
-    setState({ ...initialState, isLoading: false });
-  }
-
-  function sendToLoginScreen() {
-    setState({ ...initialState, isLoading: false, isSignedIn: false });
-  }
-
   async function handleSignIn(eventData: any) {
-
     if(eventData.success == false) {
       setState({ ...initialState, isLoading: false, isSignedIn: false })
     } else {
