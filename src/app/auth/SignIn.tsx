@@ -65,7 +65,6 @@ export default function SignIn() {
         console.log(error.message);
 
         DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: false, error: error });
-        // setState({ ...initialState, isLoading: false, isSignedIn: false })
         return;
       }
       
@@ -80,7 +79,6 @@ export default function SignIn() {
       firstName: googleUser.user?.givenName,
       email: googleUser.user?.email
     }
-    // setState({ ...initialState, isLoading: false, userInfo: googleUser, isSignedIn: true })
     DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: true, userInfo: user});
 
   }
