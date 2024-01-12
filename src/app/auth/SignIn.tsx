@@ -1,8 +1,9 @@
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import { Button, DeviceEventEmitter } from "react-native";
-import { FirebaseUtils } from "./FirebaseUtils";
-import LoadingOverlay from "./LoadingOverlay";
+import { FirebaseUtils } from "../util/FirebaseUtils";
+import LoadingOverlay from "../util/LoadingOverlay";
 import { useEffect, useState } from "react";
+import { User } from "./AuthTypes";
 
 export enum SignInEvents {
   SIGN_IN_COMPLETE = "event.onSignIn"
@@ -12,15 +13,6 @@ const initialState = {
   attemptingReSignin: false,
   reSignInSuccess: false
 }
-
-export declare interface User {
-  firstName: string | null | undefined,
-  email: string | undefined,
-  sub?: string,
-  email_verified?: boolean
-}
-
-
 
 export default function SignIn() {
   const [state, setState] = useState(initialState)

@@ -4,11 +4,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
+import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 import Home from './src/app/Home';
-import LoadingOverlay from './src/app/LoadingOverlay';
-import SignIn, { SignInEvents } from './src/app/SignIn';
-import SignOut, { SignOutEvents } from './src/app/SignOut';
-import { FirebaseUtils } from './src/app/FirebaseUtils';
+import SignIn, { SignInEvents } from './src/app/auth/SignIn';
+import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
@@ -19,7 +18,6 @@ const initialState = {
   userInfo: {},
   userMessage: ''
 }
-
 
 export default function App() {
   const [state, setState] = useState(initialState)

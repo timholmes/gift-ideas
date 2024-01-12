@@ -1,10 +1,11 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import firebaseConfig from '../../firebase-config.json';
-import { GoogleAuthProvider, getAuth, signInWithCredential, UserCredential } from '@firebase/auth';
-import { Auth, connectAuthEmulator } from 'firebase/auth';
+import { GoogleAuthProvider, UserCredential, getAuth, signInWithCredential } from '@firebase/auth';
+import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
+import { connectAuthEmulator } from 'firebase/auth';
 import { Firestore, connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
-import { SignInEvents, User } from './SignIn';
 import { DeviceEventEmitter } from 'react-native';
+import firebaseConfig from '../../../firebase-config.json';
+import { User } from '../auth/AuthTypes';
+import { SignInEvents } from '../auth/SignIn';
 export class FirebaseUtils {
   
   static initialize(): FirebaseApp {
@@ -14,7 +15,6 @@ export class FirebaseUtils {
       return getApp(); // if already initialized, use that one
     }
   }
-
   
   private static async setupAuthEmulator() {
     const app = FirebaseUtils.initialize();

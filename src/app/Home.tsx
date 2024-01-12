@@ -2,7 +2,7 @@ import { FirebaseError } from "firebase/app";
 import { QuerySnapshot, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { FirebaseUtils } from "./FirebaseUtils";
+import { FirebaseUtils } from "./util/FirebaseUtils";
 import Ideas from "./Ideas";
 
 
