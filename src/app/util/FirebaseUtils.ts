@@ -6,6 +6,7 @@ import { DeviceEventEmitter } from 'react-native';
 import firebaseConfig from '../../../firebase-config.json';
 import { User } from '../auth/AuthTypes';
 import { SignInEvents } from '../auth/SignIn';
+import { Test1 } from '../../../spec/auth/StubUsers';
 export class FirebaseUtils {
   
   static initialize(): FirebaseApp {
@@ -42,14 +43,9 @@ export class FirebaseUtils {
   static async stubSignIn() {
     console.log('stubbing sign in');
 
-    let user: User = {
-      firstName: 'Test1',
-      email: 'test1@test.com',
-      sub: 'abc1233',
-      email_verified: true
-    }
 
     let userCredential: UserCredential;
+    let user: User = Test1;
     try {
       userCredential = await FirebaseUtils.setupUser(JSON.stringify(user)); // emulator takes a plain json string
     } catch (e: any) {
