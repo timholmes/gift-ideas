@@ -56,6 +56,7 @@ export default function SignIn() {
         email: googleUser.user.email
       }
       
+      console.log('Google - re-signin success.');
       DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: true, error: null, userInfo: user });
     }
 

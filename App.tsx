@@ -24,17 +24,9 @@ const initialState = {
 export default function App() {
   const [state, setState] = useState(initialState)
 
-  async function bootstrap() {
-    if (process.env.EXPO_PUBLIC_ENVIRONMENT == 'LOCAL') {
-      await FirebaseUtils.stubSignIn();
-    } else {
-      // await attemptReSignIn();
-    }
-  }
-
   // re-initialize firebase auth state
   useEffect(() => {
-    bootstrap();
+    setupEnvironment();
     DeviceEventEmitter.addListener(SignOutEvents.SIGN_OUT_COMPLETE, (eventData) => { handleSignOut(eventData) })
     DeviceEventEmitter.addListener(SignInEvents.SIGN_IN_COMPLETE, (eventData) => { handleSignIn(eventData) })
     
@@ -44,27 +36,18 @@ export default function App() {
 
   }, []);
 
+  async function setupEnvironment() {
+    if (FirebaseUtils.isLocal()) {
+      await FirebaseUtils.stubSignIn();
+    }
+  }
+
   async function handleSignIn(eventData: any) {
     if(eventData.success == false) {
       setState({ ...initialState, isLoading: false, isSignedIn: false })
     } else {
       setState({ ...initialState, isLoading: false, userInfo: eventData.userInfo, isSignedIn: true })
     }
-  }
-
-  let landingScreen = null;
-  if (state.isSignedIn) {
-    landingScreen = <Screen name="Home">
-      { (props) => <Home {...props} userInfo={state.userInfo} /> }
-    </Screen>
-  } else if (state.isLoading) {
-    landingScreen = <Screen name="Home">
-      {(props) =>
-        <LoadingOverlay {...props} />
-      }
-    </Screen>
-  } else {
-    landingScreen = <Screen name="Sign In" component={SignIn} />
   }
 
   function handleSignOut(eventData: any) {
@@ -74,6 +57,16 @@ export default function App() {
       setState({ ...initialState, userInfo: {}, isSignedIn: false, isLoading: false, userMessage: 'Sign-out failed.' });
     }
     return;
+  }
+
+
+  let landingScreen = null;
+  if (state.isSignedIn) {
+    landingScreen = <Screen name="Home">
+      { (props) => <Home {...props} userInfo={state.userInfo} /> }
+    </Screen>
+  } else {
+    landingScreen = <Screen name="Sign In" component={SignIn} />
   }
 
 
