@@ -1,13 +1,16 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, LogBox } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 import Home from './src/app/Home';
 import SignIn, { SignInEvents } from './src/app/auth/SignIn';
 import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
+import MyIdeas from './src/app/ideas/MyIdeas';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
@@ -22,6 +25,8 @@ const initialState = {
 export default function App() {
   const [state, setState] = useState(initialState)
 
+  LogBox.ignoreAllLogs();
+  
   // re-initialize firebase auth state
   useEffect(() => {
     setupEnvironment();
@@ -57,21 +62,9 @@ export default function App() {
     return;
   }
 
-
-  let landingScreen = null;
-  if (state.isSignedIn) {
-    landingScreen = <Screen name="Home">
-      { (props) => <Home {...props} userInfo={state.userInfo} /> }
-    </Screen>
-  } else {
-    landingScreen = <Screen name="Sign In" component={SignIn} />
-  }
-
-
-  return (
-    <PaperProvider>
-      <NavigationContainer>
-        <Navigator 
+  function MainTabs() {
+    return (
+      <Tab.Navigator 
           screenOptions={{
             headerRight: () => (
               state.isSignedIn ? <SignOut></SignOut> : null
@@ -84,8 +77,53 @@ export default function App() {
             },
           }}
         >
-          {landingScreen}
-        </Navigator>
+        <Tab.Screen 
+          name="Home" 
+          component={Home} 
+          initialParams={state.userInfo}
+          options={{
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="home" color={color} size={size} />
+            )
+          }}>
+        </Tab.Screen>
+        <Tab.Screen 
+          name="My Ideas" 
+          component={MyIdeas}
+          options={{
+            tabBarLabel: 'My Ideas',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="lightbulb" color={color} size={size} />
+            )
+          }}>
+        </Tab.Screen>
+        <Tab.Screen 
+          name="Give" 
+          component={MyIdeas}
+          options={{
+            tabBarLabel: 'Give',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="wallet-giftcard" color={color} size={size} />
+            )
+          }}>
+        </Tab.Screen>
+      </Tab.Navigator>
+    )
+  }
+
+  const Tab = createBottomTabNavigator();
+  let landingScreen = null;
+  if (state.isSignedIn) {
+    landingScreen = <Tab.Screen name="Home" component={Home} initialParams={state.userInfo}></Tab.Screen>
+  } else {
+    landingScreen = <Screen name="Sign In" component={SignIn} />
+  }
+
+  return (
+    <PaperProvider>
+      <NavigationContainer>
+        <MainTabs />
       </NavigationContainer>
     </PaperProvider>
   );

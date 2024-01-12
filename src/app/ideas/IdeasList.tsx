@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { List } from "react-native-paper";
 
-function Ideas(props: any) {
+function IdeasList(props: any) {
 
     return (
         <View>
@@ -12,7 +12,6 @@ function Ideas(props: any) {
           />
         </View>
       )
-
 }
 
-export default Ideas;
+export default IdeasList;

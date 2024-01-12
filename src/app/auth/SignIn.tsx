@@ -18,7 +18,6 @@ export default function SignIn() {
   const [state, setState] = useState(initialState)
 
   useEffect(() => {
-    console.log('attempt');
     attemptReSignIn();
   }, [])
 
