@@ -25,7 +25,6 @@ export class FirebaseUtils {
     if (!auth.emulatorConfig) {
       const authUrl = 'http://localhost:9099'
       await fetch(authUrl)
-      console.log('done');
 
       try {
         connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })

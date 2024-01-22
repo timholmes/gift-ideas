@@ -1,15 +1,23 @@
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-function Home(props: any) {
+export default function Home(props: any) {
 
   return (
+    <SafeAreaView style={styles.container}>
     <View>
       <Text>
-        Welcome, {props.route.params.firstName}.
+        Welcome, { props.route.params.firstName }.
         {'\n'}
       </Text>
     </View>
+    </SafeAreaView>
   )
 }
 
-export default Home;
+
+const styles = StyleSheet.create({
+  container: {
+      flex: 1
+  }
+});

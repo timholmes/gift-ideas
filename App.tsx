@@ -11,8 +11,9 @@ import SignIn, { SignInEvents } from './src/app/auth/SignIn';
 import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
 import MyIdeas from './src/app/ideas/MyIdeas';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { AddIdea } from './src/app/ideas/AddIdea';
 
-const { Navigator, Screen } = createNativeStackNavigator();
 GoogleSignin.configure();  // required - initializes the native config
 
 const initialState = {
@@ -62,6 +63,21 @@ export default function App() {
     return;
   }
 
+  const { Navigator, Screen } = createNativeStackNavigator();
+  const IdeasStack = createNativeStackNavigator();
+  const Tab = createBottomTabNavigator();
+
+  function IdeasStackScreen() {
+    return (
+      <IdeasStack.Navigator>
+        <IdeasStack.Screen name="MyIdeas" component={MyIdeas} options={{
+          headerShown: false
+        }} />
+        <IdeasStack.Screen name="AddIdea" component={AddIdea} />
+      </IdeasStack.Navigator>
+    )
+  }
+
   function MainTabs() {
     return (
       <Tab.Navigator 
@@ -82,6 +98,7 @@ export default function App() {
           component={Home} 
           initialParams={state.userInfo}
           options={{
+            headerShown: false,
             tabBarLabel: 'Home',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="home" color={color} size={size} />
@@ -90,8 +107,10 @@ export default function App() {
         </Tab.Screen>
         <Tab.Screen 
           name="My Ideas" 
-          component={MyIdeas}
+          initialParams={state.userInfo}
+          component={IdeasStackScreen}
           options={{
+            headerShown: false,
             tabBarLabel: 'My Ideas',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="lightbulb" color={color} size={size} />
@@ -100,6 +119,7 @@ export default function App() {
         </Tab.Screen>
         <Tab.Screen 
           name="Give" 
+          initialParams={state.userInfo}
           component={MyIdeas}
           options={{
             tabBarLabel: 'Give',
@@ -111,8 +131,6 @@ export default function App() {
       </Tab.Navigator>
     )
   }
-
-  const Tab = createBottomTabNavigator();
   let landingScreen = null;
   if (state.isSignedIn) {
     landingScreen = <Tab.Screen name="Home" component={Home} initialParams={state.userInfo}></Tab.Screen>
@@ -122,9 +140,11 @@ export default function App() {
 
   return (
     <PaperProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <MainTabs />
       </NavigationContainer>
+      </GestureHandlerRootView>
     </PaperProvider>
   );
 }
