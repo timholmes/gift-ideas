@@ -1,10 +1,11 @@
 import { FirebaseError } from "firebase/app";
 import { Firestore, QuerySnapshot, collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { AnimatedFAB, List } from "react-native-paper";
 import { FirebaseUtils } from "../util/FirebaseUtils";
+import { UserContext } from "../AppContext";
 
 const ideas: any[] = [];
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
 }
 
 export default function MyIdeas(props: any) {
+    const userContext = useContext(UserContext);
     const [state, setState] = useState(initialState)
     let db: Firestore;
 
@@ -20,7 +22,6 @@ export default function MyIdeas(props: any) {
     }
 
     useEffect(() => {
-        console.log(props);
         onLoad();
     }, []);
 
@@ -29,7 +30,7 @@ export default function MyIdeas(props: any) {
 
         let docRef = undefined;
         try {
-            docRef = doc(db, "users", props.route.params.email)
+            docRef = doc(db, "users", userContext.userInfo.email)
         } catch (error) {
             console.log('Unable to get users document reference.', error);
         }
@@ -49,7 +50,6 @@ export default function MyIdeas(props: any) {
 
 
             let querySnapshot: QuerySnapshot = await getDocs(collection(docRef, "ideas"));
-
             let idea: any[] = [];
             querySnapshot.forEach((doc) => {
                 idea.push({

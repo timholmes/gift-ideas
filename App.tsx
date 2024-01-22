@@ -1,18 +1,19 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import { DeviceEventEmitter, LogBox } from 'react-native';
-import { PaperProvider } from 'react-native-paper';
-import { FirebaseUtils } from './src/app/util/FirebaseUtils';
-import Home from './src/app/Home';
-import SignIn, { SignInEvents } from './src/app/auth/SignIn';
-import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
-import MyIdeas from './src/app/ideas/MyIdeas';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PaperProvider } from 'react-native-paper';
+import { UserContext } from './src/app/AppContext';
+import Home from './src/app/Home';
+import { SignInEvents } from './src/app/auth/SignIn';
+import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
 import { AddIdea } from './src/app/ideas/AddIdea';
+import MyIdeas from './src/app/ideas/MyIdeas';
+import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 
 GoogleSignin.configure();  // required - initializes the native config
 
@@ -63,7 +64,6 @@ export default function App() {
     return;
   }
 
-  const { Navigator, Screen } = createNativeStackNavigator();
   const IdeasStack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
 
@@ -131,20 +131,16 @@ export default function App() {
       </Tab.Navigator>
     )
   }
-  let landingScreen = null;
-  if (state.isSignedIn) {
-    landingScreen = <Tab.Screen name="Home" component={Home} initialParams={state.userInfo}></Tab.Screen>
-  } else {
-    landingScreen = <Screen name="Sign In" component={SignIn} />
-  }
 
   return (
     <PaperProvider>
+      <UserContext.Provider value={state}>
       <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <MainTabs />
       </NavigationContainer>
       </GestureHandlerRootView>
+      </UserContext.Provider>
     </PaperProvider>
   );
 }
