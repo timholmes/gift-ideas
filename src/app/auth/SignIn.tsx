@@ -1,9 +1,9 @@
-import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+import { GoogleSignin, statusCodes, User as GoogleUser } from "@react-native-google-signin/google-signin";
 import { Button, DeviceEventEmitter } from "react-native";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 import LoadingOverlay from "../util/LoadingOverlay";
 import { useEffect, useState } from "react";
-import { User } from "./AuthTypes";
+import { User } from "../AppContext";
 
 export enum SignInEvents {
   SIGN_IN_COMPLETE = "event.onSignIn"
@@ -27,7 +27,7 @@ export default function SignIn() {
     if (await GoogleSignin.isSignedIn()) {
       console.log('Google - attempting re-signin.');
 
-      let googleUser = null;
+      let googleUser: GoogleUser | null;
       try {
         googleUser = await GoogleSignin.getCurrentUser();
       } catch (e) {
@@ -35,17 +35,14 @@ export default function SignIn() {
         return;
       }
 
-      if (!googleUser?.idToken) {  // id token expired
+      if (googleUser == null || !googleUser.idToken) {  // id token expired
         setState({ ...initialState, attemptingReSignin: false, reSignInSuccess: false });
         return;
       }
       
       setState({ ...initialState, attemptingReSignin: true, reSignInSuccess: true });
 
-      let user: User = {
-        firstName: googleUser.user.givenName,
-        email: googleUser.user.email
-      }
+      const user: User = buildUserFromGoogleUser(googleUser);
       
       console.log('Google - re-signin success.');
       DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: true, error: null, userInfo: user });
@@ -56,7 +53,7 @@ export default function SignIn() {
 
   async function signIn() {
 
-    let googleUser = null;
+    let googleUser: GoogleUser | null = null;
     try {
       googleUser = await GoogleSignin.signIn();
     } catch (error: any) {  // code doesn't exist on 
@@ -71,17 +68,23 @@ export default function SignIn() {
       DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: false, error: error});
     }
 
-    googleUser = (googleUser == null) ? {} : googleUser;
-    await FirebaseUtils.setupUser(googleUser?.idToken);
-
-    let user: User = {
-      firstName: googleUser.user?.givenName,
-      email: googleUser.user?.email
+    if(googleUser == null || !googleUser.idToken) {
+      DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: false, error: new Error("Google returned an invalid response during sign in.") });
+    } else {
+      await FirebaseUtils.setupUser(googleUser.idToken);
+      const user: User = buildUserFromGoogleUser(googleUser);
+      DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: true, userInfo: user});
     }
-    DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: true, userInfo: user});
-
   }
 
+  function buildUserFromGoogleUser(googleUser: GoogleUser) {
+    let appUser: User = {
+      firstName: (googleUser.user && googleUser.user.givenName) ? googleUser.user.givenName : '',
+      email: googleUser.user.email
+    }
+
+    return appUser;
+  }
 
   let landingPage = null;
   if(state.attemptingReSignin) {

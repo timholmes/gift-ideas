@@ -4,9 +4,9 @@ import { connectAuthEmulator } from 'firebase/auth';
 import { Firestore, connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { DeviceEventEmitter } from 'react-native';
 import firebaseConfig from '../../../firebase-config.json';
-import { User } from '../auth/AuthTypes';
 import { SignInEvents } from '../auth/SignIn';
 import { Test1 } from '../../../spec/auth/StubUsers';
+import { User } from '../AppContext';
 
 // TODO: we are mixing class and function constructs.  Need to refactor.
 export class FirebaseUtils {

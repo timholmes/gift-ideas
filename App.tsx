@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { DeviceEventEmitter, LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
-import { UserContext } from './src/app/AppContext';
+import { UserContext, initialContext } from './src/app/AppContext';
 import Home from './src/app/Home';
 import { SignInEvents } from './src/app/auth/SignIn';
 import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
@@ -17,15 +17,8 @@ import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 
 GoogleSignin.configure();  // required - initializes the native config
 
-const initialState = {
-  isLoading: true,
-  isSignedIn: false,
-  userInfo: {},
-  userMessage: ''
-}
-
 export default function App() {
-  const [state, setState] = useState(initialState)
+  const [state, setState] = useState(initialContext)
 
   LogBox.ignoreAllLogs();
   
@@ -49,17 +42,17 @@ export default function App() {
 
   async function handleSignIn(eventData: any) {
     if(eventData.success == false) {
-      setState({ ...initialState, isLoading: false, isSignedIn: false })
+      setState({ ...initialContext, isLoading: false, isSignedIn: false })
     } else {
-      setState({ ...initialState, isLoading: false, userInfo: eventData.userInfo, isSignedIn: true })
+      setState({ ...initialContext, isLoading: false, userInfo: eventData.userInfo, isSignedIn: true })
     }
   }
 
   function handleSignOut(eventData: any) {
     if(eventData.success && !eventData.error) {
-      setState({ ...initialState, userInfo: {}, isSignedIn: false, isLoading: false });
+      setState({ ...initialContext,isSignedIn: false, isLoading: false });
     } else {
-      setState({ ...initialState, userInfo: {}, isSignedIn: false, isLoading: false, userMessage: 'Sign-out failed.' });
+      setState({ ...initialContext, isSignedIn: false, isLoading: false, userMessage: 'Sign-out failed.' });
     }
     return;
   }
