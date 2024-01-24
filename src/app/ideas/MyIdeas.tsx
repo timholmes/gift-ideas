@@ -26,8 +26,10 @@ export default function MyIdeas(props: any) {
     }, []);
 
     async function onLoad() {
-        db = FirebaseUtils.getFirestoreDatbase();
+        db = FirebaseUtils.getFirestoreDatabase();
 
+
+        // TODO: simplify firestore query to path based
         let docRef = undefined;
         try {
             docRef = doc(db, "users", userContext.userInfo.email)

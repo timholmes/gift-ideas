@@ -7,7 +7,11 @@ import firebaseConfig from '../../../firebase-config.json';
 import { User } from '../auth/AuthTypes';
 import { SignInEvents } from '../auth/SignIn';
 import { Test1 } from '../../../spec/auth/StubUsers';
+
+// TODO: we are mixing class and function constructs.  Need to refactor.
 export class FirebaseUtils {
+
+  static databaseInitialized = false;
   
   static initialize(): FirebaseApp {
     if (getApps().length == 0) {
@@ -15,6 +19,18 @@ export class FirebaseUtils {
     } else {
       return getApp(); // if already initialized, use that one
     }
+  }
+
+  static getFirestoreDatabase(): Firestore {
+    const firebaseApp = FirebaseUtils.initialize();
+    const db = getFirestore(firebaseApp);
+    
+    if (!this.databaseInitialized && FirebaseUtils.isLocal()) {
+      connectFirestoreEmulator(db, 'localhost', 8080);
+    }
+    
+    this.databaseInitialized = true;
+    return db;
   }
   
   private static async setupAuthEmulator() {
@@ -41,7 +57,6 @@ export class FirebaseUtils {
 
   static async stubSignIn() {
     console.log('stubbing sign in');
-
 
     let userCredential: UserCredential;
     let user: User = Test1;
@@ -73,15 +88,4 @@ export class FirebaseUtils {
     return signInWithCredential(getAuth(), provider)
   }
 
-
-  static getFirestoreDatbase(): Firestore {
-    const firebaseApp = FirebaseUtils.initialize();
-    const db = getFirestore(firebaseApp);
-
-    if (FirebaseUtils.isLocal()) {
-      connectFirestoreEmulator(db, 'localhost', 8080);
-    }
-
-    return db;
-  }
 }
