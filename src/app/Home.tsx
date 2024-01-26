@@ -9,12 +9,12 @@ export default function Home(props: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-    <View>
-      <Text>
-        Welcome, { userContext.userInfo.email }.
-        {'\n'}
-      </Text>
-    </View>
+      <View>
+        <Text>
+          Welcome, {userContext.userInfo?.firstName}.
+          {'\n'}
+        </Text>
+      </View>
     </SafeAreaView>
   )
 }

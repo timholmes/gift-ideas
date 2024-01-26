@@ -74,7 +74,7 @@ export class FirebaseUtils {
       console.error('Firebase login failed..', e);
       return;
     }
-
+    
     DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: true, userInfo: user });
   }
 

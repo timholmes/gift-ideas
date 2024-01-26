@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { CommonActions, NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import { DeviceEventEmitter, LogBox } from 'react-native';
@@ -9,7 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { UserContext, initialContext } from './src/app/AppContext';
 import Home from './src/app/Home';
-import { SignInEvents } from './src/app/auth/SignIn';
+import SignIn, { SignInEvents } from './src/app/auth/SignIn';
 import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
 import { AddIdea } from './src/app/ideas/AddIdea';
 import MyIdeas from './src/app/ideas/MyIdeas';
@@ -27,7 +27,7 @@ export default function App() {
     setupEnvironment();
     DeviceEventEmitter.addListener(SignOutEvents.SIGN_OUT_COMPLETE, (eventData) => { handleSignOut(eventData) })
     DeviceEventEmitter.addListener(SignInEvents.SIGN_IN_COMPLETE, (eventData) => { handleSignIn(eventData) })
-    
+
     return () => {
       DeviceEventEmitter.removeAllListeners();
     };
@@ -36,11 +36,14 @@ export default function App() {
 
   async function setupEnvironment() {
     if (FirebaseUtils.isLocal()) {
+      console.log("Environment is 'local'.");
       await FirebaseUtils.stubSignIn();
     }
   }
 
   async function handleSignIn(eventData: any) {
+    console.log(`Signin is complete.  Success? ${eventData.success}`);
+
     if(eventData.success == false) {
       setState({ ...initialContext, isLoading: false, isSignedIn: false })
     } else {
@@ -59,6 +62,18 @@ export default function App() {
 
   const IdeasStack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
+  // const SignInStack = createNativeStackNavigator();
+
+  // const navigation = useNavigation();
+
+
+  // function SignInStackScreen() {
+  //   return (
+  //     <SignInStack.Navigator>
+  //       <SignInStack.Screen name="SignIn" component={SignIn} />
+  //     </SignInStack.Navigator>
+  //   )
+  // }
 
   function IdeasStackScreen() {
     return (
@@ -113,7 +128,7 @@ export default function App() {
         <Tab.Screen 
           name="Give" 
           initialParams={state.userInfo}
-          component={MyIdeas}
+          component={Home}
           options={{
             tabBarLabel: 'Give',
             tabBarIcon: ({ color, size }) => (
@@ -128,11 +143,12 @@ export default function App() {
   return (
     <PaperProvider>
       <UserContext.Provider value={state}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <MainTabs />
-      </NavigationContainer>
-      </GestureHandlerRootView>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <NavigationContainer>
+            {/* <SignInStackScreen/> */}
+            <MainTabs />
+          </NavigationContainer>
+        </GestureHandlerRootView>
       </UserContext.Provider>
     </PaperProvider>
   );

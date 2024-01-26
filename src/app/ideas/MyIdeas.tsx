@@ -1,87 +1,121 @@
 import { FirebaseError } from "firebase/app";
 import { Firestore, QuerySnapshot, collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { AnimatedFAB, List } from "react-native-paper";
 import { FirebaseUtils } from "../util/FirebaseUtils";
-import { UserContext } from "../AppContext";
+import { Idea, UserContext } from "../AppContext";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-const ideas: any[] = [];
+const ideas: Idea[] = [];
 const initialState = {
     ideas: ideas
 }
 
-export default function MyIdeas(props: any) {
+export default function MyIdeas({ route, navigation }: any) {
     const userContext = useContext(UserContext);
     const [state, setState] = useState(initialState)
+    // const { reloadContent } = route.params;
+
     let db: Firestore;
 
     enum FirestoreErrorCodes {
         PERMISSION_DENIED = 'permission-denied'
     }
 
-    useEffect(() => {
-        onLoad();
-    }, []);
+    // called when params are changed.  1st - when params are undefined on load, 2nd - when navigating back from another screen
+    useFocusEffect(
+        useCallback(
+            () => {
+                console.log('myideas - focus effect');
+                console.log(`** route: ${JSON.stringify(route)}`);
 
-    async function onLoad() {
-        db = FirebaseUtils.getFirestoreDatabase();
-
-
-        // TODO: simplify firestore query to path based
-        let docRef = undefined;
-        try {
-            docRef = doc(db, "users", userContext.userInfo.email)
-        } catch (error) {
-            console.log('Unable to get users document reference.', error);
-        }
-
-        if (docRef != undefined) {
-            let userDocument = null;
-            try {
-                userDocument = await getDoc(docRef) // do this to determine permission?
-            } catch (error: any) {
-                if (error instanceof FirebaseError && error.code == FirestoreErrorCodes.PERMISSION_DENIED) {
-                    console.log('Permission denied accessing user document.');
+                if (route.params && route.params.refreshContent) {
+                    onLoad(true);
+                } else {
+                    onLoad();
                 }
 
-                console.error('Cannot read users document.', error)
+            }, [route.params])
+    );
+
+    async function onLoad(useContext: boolean = false) {
+        console.log(`my ideas: load useContext? ${useContext}`);
+
+        if (useContext) {
+
+            setState({ ...userContext });
+
+        } else {    // reload data from firebase
+
+            db = FirebaseUtils.getFirestoreDatabase();
+
+            // TODO: show a a critical error and force login
+            if (!userContext.userInfo) {
                 return;
             }
 
+            // TODO: simplify firestore query to path based
+            let docRef = undefined;
+            try {
+                docRef = doc(db, "users", userContext.userInfo.email)
+            } catch (error) {
+                console.log('Unable to get users document reference.', error);
+            }
 
-            let querySnapshot: QuerySnapshot = await getDocs(collection(docRef, "ideas"));
-            let idea: any[] = [];
-            querySnapshot.forEach((doc) => {
-                idea.push({
-                    id: doc.id,
-                    data: doc.data()
-                })
-            });
+            if (docRef != undefined) {
+                let userDocument = null;
+                try {
+                    userDocument = await getDoc(docRef) // do this to determine permission?
+                } catch (error: any) {
+                    if (error instanceof FirebaseError && error.code == FirestoreErrorCodes.PERMISSION_DENIED) {
+                        console.log('Permission denied accessing user document.');
+                    }
 
-            setState({ ideas: idea });
+                    console.error('Cannot read users document.', error)
+                    return;
+                }
+
+
+                let querySnapshot: QuerySnapshot = await getDocs(collection(docRef, "ideas"));
+
+                let newIdeas: Idea[] = [];
+                querySnapshot.forEach((doc) => {
+
+                    let idea: Idea = {
+                        id: doc.id,
+                        title: doc.data().title,
+                        description: doc.data().description
+                    }
+                    newIdeas.push(idea)
+                });
+
+                setState({ ...state, ideas: newIdeas });
+            }
+
         }
     }
+
     const rightSwipeActions = (progressAnimatedValue: any, dragAnimatedValue: any, swipeable: Swipeable) => {
 
         async function deletePress() {
             console.log('***** press');
             console.log(swipeable.props.id);
             const id: string | undefined = swipeable?.props?.id?.toString()
-            if(id) {
+            if (id) {
 
                 try {
                     // const docRef = doc(db, "users", props.route.params.email)
                     // console.log('ref');
                     // console.log(docRef);
                     // await deleteDoc(doc(db, "users", props.route.params.email))
-                } catch(error) {
+                } catch (error) {
                     console.error(error);
                 }
             }
         }
-    
+
         return (
             <View
                 style={{
@@ -113,7 +147,7 @@ export default function MyIdeas(props: any) {
             >
                 <List.Item
                     key={idea.id}
-                    title={idea.data.title}
+                    title={idea.title}
                     description="Item description"
                     left={props => <List.Icon {...props} icon="lightbulb" />}
                     id={idea.id}
@@ -125,12 +159,13 @@ export default function MyIdeas(props: any) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.list}>
+                <Text>{JSON.stringify(route)}</Text>
                 {ideasList()}
                 <AnimatedFAB
                     icon={'plus'}
                     label={'Label'}
                     extended={false}
-                    onPress={() => props.navigation.navigate('AddIdea')}
+                    onPress={() => navigation.navigate('AddIdea')}
                     visible={true}
                     animateFrom={'right'}
                     iconMode={'static'}
