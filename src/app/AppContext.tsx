@@ -15,7 +15,7 @@ export declare interface User {
 }
 
 export declare interface Idea {
-    id: string,
+    id?: string,
     title: string,
     description: string
 }

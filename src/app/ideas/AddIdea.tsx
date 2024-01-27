@@ -28,28 +28,26 @@ export function AddIdea({ navigation }: any) {
                 initialValues={{ title: '', description: '' }}
                 // validationSchema={validationSchema}
                 onSubmit={async values => {
-                    console.log('submit');
-                    navigation.navigate('MyIdeas', { refreshContent: true });
-                    return;
-                    // if (!userContext.userInfo) {
-                    //     setState({ showError: true, errorMessage: 'Error saving your ideas.  Please login again.' })
-                    // } else {
+                    if (!userContext.userInfo) {
+                        setState({ showError: true, errorMessage: 'Error saving your ideas.  Please login again.' })
+                    } else {
                         
-                    //     FirebaseUtils.getFirestoreDatabase()
+                        FirebaseUtils.getFirestoreDatabase()
 
-                    //     let newIdea: Idea = { title: values.title, description: values.description };
-                    //     try {
-                    //         await addDoc(collection(db, "users", userContext.userInfo.email, "ideas"), newIdea);
+                        let newIdea: Idea = { title: values.title, description: values.description };
+                        try {
+                            const docRef = await addDoc(collection(db, "users", userContext.userInfo.email, "ideas"), newIdea);
+                            newIdea.id = docRef.id
 
-                    //         userContext.ideas.push(newIdea);
-                    //     } catch (error) {
-                    //         setState({ showError: true, errorMessage: 'Error saving your ideas.' })
-                    //         console.error(error);
-                    //         return;
-                    //     }
+                            userContext.ideas.push(newIdea);
+                        } catch (error) {
+                            setState({ showError: true, errorMessage: 'Error saving your ideas.' })
+                            console.error(error);
+                            return;
+                        }
 
-                    //     navigation.navigate('MyIdeas', { refreshContent: true });
-                    // }
+                        navigation.navigate('MyIdeas', { refreshContent: true });
+                    }
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors }) => (

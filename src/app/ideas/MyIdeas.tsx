@@ -1,7 +1,7 @@
 import { FirebaseError } from "firebase/app";
 import { Firestore, QuerySnapshot, collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { AnimatedFAB, List } from "react-native-paper";
 import { FirebaseUtils } from "../util/FirebaseUtils";
@@ -92,6 +92,9 @@ export default function MyIdeas({ route, navigation }: any) {
                 });
 
                 setState({ ...state, ideas: newIdeas });
+     
+                userContext.ideas = newIdeas;
+                console.log('added ideas');
             }
 
         }
@@ -159,8 +162,9 @@ export default function MyIdeas({ route, navigation }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.list}>
-                <Text>{JSON.stringify(route)}</Text>
+                <ScrollView>
                 {ideasList()}
+                </ScrollView>
                 <AnimatedFAB
                     icon={'plus'}
                     label={'Label'}
