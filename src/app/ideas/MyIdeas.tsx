@@ -94,7 +94,6 @@ export default function MyIdeas({ route, navigation }: any) {
                 setState({ ...state, ideas: newIdeas });
      
                 userContext.ideas = newIdeas;
-                console.log('added ideas');
             }
 
         }
@@ -106,13 +105,16 @@ export default function MyIdeas({ route, navigation }: any) {
             console.log('***** press');
             console.log(swipeable.props.id);
             const id: string | undefined = swipeable?.props?.id?.toString()
-            if (id) {
+            if (id && userContext.userInfo?.email) {
 
+                db = FirebaseUtils.getFirestoreDatabase();
                 try {
-                    // const docRef = doc(db, "users", props.route.params.email)
-                    // console.log('ref');
-                    // console.log(docRef);
-                    // await deleteDoc(doc(db, "users", props.route.params.email))
+                    console.log(userContext.userInfo?.email);
+                    const ideaDocRef = doc(db, "users", userContext.userInfo?.email, "ideas", id)
+                    console.log('after');
+                    await deleteDoc(ideaDocRef);
+
+                    onLoad(false)
                 } catch (error) {
                     console.error(error);
                 }
