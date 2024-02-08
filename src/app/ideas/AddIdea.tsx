@@ -7,14 +7,23 @@ import * as Yup from 'yup';
 import { Idea, UserContext } from '../AppContext';
 import { FirebaseUtils } from '../util/FirebaseUtils';
 
-export function AddIdea({ navigation }: any) {
+export function AddIdea({route, navigation }: any) {
 
     const db = FirebaseUtils.getFirestoreDatabase();
     const userContext = useContext(UserContext);
-    const [state, setState] = useState({ showError: false, errorMessage: '' })
+    const [state, setState] = useState({ showError: false, errorMessage: '', idea: {
+        id: '',
+        title: '',
+        description: ''
+    } })
+    const { idea } = route.params;
 
     useEffect(() => {
         // navigation.navigate('MyIdeas', { refreshContent: true });
+
+        console.log(idea);
+
+        setState({ ...state, idea: idea})
     }, [])
 
     const validationSchema = Yup.object().shape({
@@ -25,11 +34,12 @@ export function AddIdea({ navigation }: any) {
     return (
         <View>
             <Formik
-                initialValues={{ title: '', description: '' }}
+                initialValues={ state.idea }
                 // validationSchema={validationSchema}
+                enableReinitialize={true}
                 onSubmit={async values => {
                     if (!userContext.userInfo) {
-                        setState({ showError: true, errorMessage: 'Error saving your ideas.  Please login again.' })
+                        setState({ ...state, showError: true, errorMessage: 'Error saving your ideas.  Please login again.' })
                     } else {
                         
                         FirebaseUtils.getFirestoreDatabase()
@@ -41,7 +51,7 @@ export function AddIdea({ navigation }: any) {
 
                             userContext.ideas.push(newIdea);
                         } catch (error) {
-                            setState({ showError: true, errorMessage: 'Error saving your ideas.' })
+                            setState({ ...state, showError: true, errorMessage: 'Error saving your ideas.' })
                             console.error(error);
                             return;
                         }
@@ -52,6 +62,7 @@ export function AddIdea({ navigation }: any) {
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
                     <View style={{ margin: 10 }}>
+                        <Text >{JSON.stringify(values)}</Text>
                         <TextInput
                             style={{ margin: 5 }}
                             label="Title"

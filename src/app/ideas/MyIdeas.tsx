@@ -1,7 +1,7 @@
 import { FirebaseError } from "firebase/app";
 import { Firestore, QuerySnapshot, collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { GestureResponderEvent, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { AnimatedFAB, List } from "react-native-paper";
 import { FirebaseUtils } from "../util/FirebaseUtils";
@@ -16,7 +16,6 @@ const initialState = {
 export default function MyIdeas({ route, navigation }: any) {
     const userContext = useContext(UserContext);
     const [state, setState] = useState(initialState)
-    // const { reloadContent } = route.params;
 
     let db: Firestore;
 
@@ -29,7 +28,6 @@ export default function MyIdeas({ route, navigation }: any) {
         useCallback(
             () => {
                 console.log('myideas - focus effect');
-                console.log(`** route: ${JSON.stringify(route)}`);
 
                 if (route.params && route.params.refreshContent) {
                     onLoad(true);
@@ -49,6 +47,7 @@ export default function MyIdeas({ route, navigation }: any) {
 
         } else {    // reload data from firebase
 
+            console.log('getting ideas from firebase');
             db = FirebaseUtils.getFirestoreDatabase();
 
             // TODO: show a a critical error and force login
@@ -98,29 +97,25 @@ export default function MyIdeas({ route, navigation }: any) {
 
         }
     }
+    
+    async function deletePress(swipeable: Swipeable) {
+        const id: string | undefined = swipeable?.props?.id?.toString()
+        if (id && userContext.userInfo?.email) {
 
-    const rightSwipeActions = (progressAnimatedValue: any, dragAnimatedValue: any, swipeable: Swipeable) => {
+            db = FirebaseUtils.getFirestoreDatabase();
+            try {
+                console.log(userContext.userInfo?.email);
+                const ideaDocRef = doc(db, "users", userContext.userInfo?.email, "ideas", id)
+                await deleteDoc(ideaDocRef);
 
-        async function deletePress() {
-            console.log('***** press');
-            console.log(swipeable.props.id);
-            const id: string | undefined = swipeable?.props?.id?.toString()
-            if (id && userContext.userInfo?.email) {
-
-                db = FirebaseUtils.getFirestoreDatabase();
-                try {
-                    console.log(userContext.userInfo?.email);
-                    const ideaDocRef = doc(db, "users", userContext.userInfo?.email, "ideas", id)
-                    console.log('after');
-                    await deleteDoc(ideaDocRef);
-
-                    onLoad(false)
-                } catch (error) {
-                    console.error(error);
-                }
+                onLoad(false)
+            } catch (error) {
+                console.error(error);
             }
         }
+    }
 
+    const rightSwipeActions = (progressAnimatedValue: any, dragAnimatedValue: any, swipeable: Swipeable) => {
         return (
             <View
                 style={{
@@ -130,7 +125,9 @@ export default function MyIdeas({ route, navigation }: any) {
                 }}
             >
                 <Text
-                    onPress={deletePress}
+                    onPress={() => {
+                        deletePress(swipeable);
+                    }}
                     style={{
                         color: '#1b1a17',
                         fontWeight: '600',
@@ -153,9 +150,12 @@ export default function MyIdeas({ route, navigation }: any) {
                 <List.Item
                     key={idea.id}
                     title={idea.title}
-                    description="Item description"
+                    description={idea.description}
                     left={props => <List.Icon {...props} icon="lightbulb" />}
                     id={idea.id}
+                    onPress={() => navigation.navigate('AddIdea', {
+                        idea: idea
+                    })}
                 />
             </Swipeable>
         )
