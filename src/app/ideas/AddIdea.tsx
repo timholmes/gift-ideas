@@ -4,8 +4,9 @@ import { useContext, useEffect, useState } from 'react';
 import { GestureResponderEvent, View } from "react-native";
 import { Button, Portal, Snackbar, Text, TextInput } from "react-native-paper";
 import * as Yup from 'yup';
-import { Idea, UserContext } from '../AppContext';
+import { UserContext } from '../AppContext';
 import { FirebaseUtils } from '../util/FirebaseUtils';
+import { Idea } from '../Types';
 
 export function AddIdea({route, navigation }: any) {
 
@@ -59,7 +60,6 @@ export function AddIdea({route, navigation }: any) {
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
                     <View style={{ margin: 10 }}>
-                        <Text >{JSON.stringify(values)}</Text>
                         <TextInput
                             style={{ margin: 5 }}
                             label="Title"

@@ -1,12 +1,14 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { FirebaseError } from "firebase/app";
 import { Firestore, QuerySnapshot, collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
-import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
-import { GestureResponderEvent, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { AnimatedFAB, List } from "react-native-paper";
+import { AnimatedFAB } from "react-native-paper";
+import { UserContext } from "../AppContext";
+import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
-import { Idea, UserContext } from "../AppContext";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { SwipeableIdea, SwipeableIdeaEvents } from "./SwipeableIdea";
 
 const ideas: Idea[] = [];
 const initialState = {
@@ -23,12 +25,20 @@ export default function MyIdeas({ route, navigation }: any) {
         PERMISSION_DENIED = 'permission-denied'
     }
 
+    useEffect(() => {
+        DeviceEventEmitter.addListener(SwipeableIdeaEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) })
+        DeviceEventEmitter.addListener(SwipeableIdeaEvents.ITEM_PRESS, (idea: Idea) => { handleItemPress(idea) })
+    
+        return () => {
+          DeviceEventEmitter.removeAllListeners();
+        };
+    
+      }, []);
+
     // called when params are changed.  1st - when params are undefined on load, 2nd - when navigating back from another screen
     useFocusEffect(
         useCallback(
             () => {
-                console.log('myideas - focus effect');
-
                 if (route.params && route.params.refreshContent) {
                     onLoad(true);
                 } else {
@@ -76,7 +86,6 @@ export default function MyIdeas({ route, navigation }: any) {
                     return;
                 }
 
-
                 let querySnapshot: QuerySnapshot = await getDocs(collection(docRef, "ideas"));
 
                 let newIdeas: Idea[] = [];
@@ -98,7 +107,7 @@ export default function MyIdeas({ route, navigation }: any) {
         }
     }
     
-    async function deletePress(swipeable: Swipeable) {
+    async function handleDeletePress(swipeable: Swipeable) {
         const id: string | undefined = swipeable?.props?.id?.toString()
         if (id && userContext.userInfo?.email) {
 
@@ -115,50 +124,14 @@ export default function MyIdeas({ route, navigation }: any) {
         }
     }
 
-    const rightSwipeActions = (progressAnimatedValue: any, dragAnimatedValue: any, swipeable: Swipeable) => {
-        return (
-            <View
-                style={{
-                    backgroundColor: '#ff8303',
-                    justifyContent: 'center',
-                    alignItems: 'flex-end',
-                }}
-            >
-                <Text
-                    onPress={() => {
-                        deletePress(swipeable);
-                    }}
-                    style={{
-                        color: '#1b1a17',
-                        fontWeight: '600',
-                        paddingHorizontal: 30,
-                        paddingVertical: 20,
-                    }}
-                >
-                    Delete
-                </Text>
-            </View>
-        );
-    };
+    const handleItemPress = (idea: any) => {
+        navigation.navigate('AddIdea', { idea: idea})
+    }
 
     const ideasList = () => {
         return state.ideas.map((idea, index) =>
-            <Swipeable key={idea.id}
-                id={idea.id}
-                renderRightActions={rightSwipeActions}
-            >
-                <List.Item
-                    key={idea.id}
-                    title={idea.title}
-                    description={idea.description || '-no description-'}
-                    left={props => <List.Icon {...props} icon="lightbulb" />}
-                    id={idea.id}
-                    onPress={() => navigation.navigate('AddIdea', {
-                        idea: idea
-                    })}
-                />
-            </Swipeable>
-        )
+            <SwipeableIdea idea={idea} key={index}></SwipeableIdea>
+        );
     }
 
     return (
