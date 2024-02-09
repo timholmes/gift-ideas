@@ -11,19 +11,16 @@ export function AddIdea({route, navigation }: any) {
 
     const db = FirebaseUtils.getFirestoreDatabase();
     const userContext = useContext(UserContext);
-    const [state, setState] = useState({ showError: false, errorMessage: '', idea: {
+    const [state, setState] = useState({ showError: false, errorMessage: '', mode: "ADD", idea: {
         id: '',
         title: '',
         description: ''
     } })
-    const { idea } = route.params;
 
     useEffect(() => {
-        // navigation.navigate('MyIdeas', { refreshContent: true });
-
-        console.log(idea);
-
-        setState({ ...state, idea: idea})
+        if (route.params?.idea) {
+            setState({ ...state, idea: route.params.idea, mode: "EDIT"})
+        }
     }, [])
 
     const validationSchema = Yup.object().shape({

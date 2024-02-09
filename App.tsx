@@ -81,7 +81,7 @@ export default function App() {
         <IdeasStack.Screen name="MyIdeas" component={MyIdeas} options={{
           headerShown: false
         }} />
-        <IdeasStack.Screen name="AddIdea" component={AddIdea} options={{ title: "New Idea"}}/>
+        <IdeasStack.Screen name="AddIdea" component={AddIdea} options={{ title: "Idea"}}/>
       </IdeasStack.Navigator>
     )
   }

@@ -150,7 +150,7 @@ export default function MyIdeas({ route, navigation }: any) {
                 <List.Item
                     key={idea.id}
                     title={idea.title}
-                    description={idea.description}
+                    description={idea.description || '-no description-'}
                     left={props => <List.Icon {...props} icon="lightbulb" />}
                     id={idea.id}
                     onPress={() => navigation.navigate('AddIdea', {
