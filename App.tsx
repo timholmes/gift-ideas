@@ -15,6 +15,7 @@ import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
 import { AddIdea } from './src/app/ideas/AddIdea';
 import MyIdeas from './src/app/ideas/MyIdeas';
 import { FirebaseUtils } from './src/app/util/FirebaseUtils';
+import { Test1, Test2 } from './spec/auth/StubUsers';
 
 GoogleSignin.configure();  // required - initializes the native config
 
@@ -38,7 +39,7 @@ export default function App() {
   async function setupEnvironment() {
     if (FirebaseUtils.isLocal()) {
       console.log("Environment is 'local'.");
-      await FirebaseUtils.stubSignIn();
+      await FirebaseUtils.stubSignIn(Test2);
     }
   }
 

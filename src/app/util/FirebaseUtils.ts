@@ -6,7 +6,7 @@ import { DeviceEventEmitter } from 'react-native';
 import firebaseConfig from '../../../firebase-config.json';
 import { SignInEvents } from '../auth/SignIn';
 import { Test1 } from '../../../spec/auth/StubUsers';
-import { User } from '../AppContext';
+import { User } from '../Types';
 
 // TODO: we are mixing class and function constructs.  Need to refactor.
 export class FirebaseUtils {
@@ -55,11 +55,10 @@ export class FirebaseUtils {
     return (process.env.EXPO_PUBLIC_ENVIRONMENT == 'LOCAL') ? true : false
   }
 
-  static async stubSignIn() {
+  static async stubSignIn(user: User) {
     console.log('stubbing sign in');
 
     let userCredential: UserCredential;
-    let user: User = Test1;
     try {
       userCredential = await FirebaseUtils.setupUser(JSON.stringify(user)); // emulator takes a plain json string
     } catch (e: any) {

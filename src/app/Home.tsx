@@ -1,7 +1,8 @@
 import { useContext } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserContext } from "./AppContext";
+import { Button } from "react-native-paper";
 
 export default function Home(props: any) {
 
@@ -10,10 +11,18 @@ export default function Home(props: any) {
   return (
     <SafeAreaView style={styles.container}>
       <View>
-        <Text>
+        <Text style={styles.welcome}>
           Welcome, {userContext.userInfo?.firstName}.
           {'\n'}
         </Text>
+        <Text style={styles.title}>
+          To invite someone to your ideas, click below.
+        </Text>
+        <Button
+          onPress={() => Alert.alert('Simple Button pressed')}
+          mode="contained"
+          style={styles.button}
+        >Add</Button>
       </View>
     </SafeAreaView>
   )
@@ -23,5 +32,17 @@ export default function Home(props: any) {
 const styles = StyleSheet.create({
   container: {
       flex: 1
+  },
+  welcome: {
+    fontSize: 18
+  },
+  title: {
+    marginVertical: 8,
+    fontSize: 16
+  },
+  button: {
+    width: 100,
+    margin: 10,
+    alignContent: 'center'
   }
 });

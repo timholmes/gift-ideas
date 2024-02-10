@@ -42,7 +42,7 @@ export function AddIdea({route, navigation }: any) {
                         
                         FirebaseUtils.getFirestoreDatabase()
 
-                        let newIdea: Idea = { title: values.title, description: values.description };
+                        let newIdea: Idea = { title: values.title, description: values.description, visibility: 'public' };
                         try {
                             const docRef = await addDoc(collection(db, "users", userContext.userInfo.email, "ideas"), newIdea);
                             newIdea.id = docRef.id
