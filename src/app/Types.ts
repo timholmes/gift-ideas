@@ -16,8 +16,17 @@ export declare interface User {
 export declare interface Idea {
     id?: string,
     title: string,
-    description: string,
-    visibility: string
+    description: string
+}
+
+export declare interface Sharing {
+    view: {
+        users: string[]
+    }
+}
+
+export declare interface Relative {
+    email: string
 }
 
 // set initial values for the context

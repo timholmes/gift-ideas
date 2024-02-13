@@ -3,7 +3,7 @@ import { Button, DeviceEventEmitter } from "react-native";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 import LoadingOverlay from "../util/LoadingOverlay";
 import { useEffect, useState } from "react";
-import { User } from "../AppContext";
+import { User } from "../Types";
 
 export enum SignInEvents {
   SIGN_IN_COMPLETE = "event.onSignIn"

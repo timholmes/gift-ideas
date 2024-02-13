@@ -94,8 +94,7 @@ export default function MyIdeas({ route, navigation }: any) {
                     let idea: Idea = {
                         id: doc.id,
                         title: doc.data().title,
-                        description: doc.data().description,
-                        visibility: 'public'
+                        description: doc.data().description
                     }
                     newIdeas.push(idea)
                 });

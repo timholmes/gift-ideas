@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { UserContext } from "./AppContext";
 import { Button } from "react-native-paper";
 
-export default function Home(props: any) {
+export default function Home({ route, navigation}: any) {
 
   const userContext = useContext(UserContext);
 
@@ -19,7 +19,7 @@ export default function Home(props: any) {
           To invite someone to your ideas, click below.
         </Text>
         <Button
-          onPress={() => Alert.alert('Simple Button pressed')}
+          onPress={() => navigation.navigate('Sharing')}
           mode="contained"
           style={styles.button}
         >Add</Button>

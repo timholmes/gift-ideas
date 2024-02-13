@@ -16,6 +16,7 @@ import { AddIdea } from './src/app/ideas/AddIdea';
 import MyIdeas from './src/app/ideas/MyIdeas';
 import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 import { Test1, Test2 } from './spec/auth/StubUsers';
+import { Sharing } from './src/app/permissions/Sharing';
 
 GoogleSignin.configure();  // required - initializes the native config
 
@@ -62,6 +63,7 @@ export default function App() {
     return;
   }
 
+  const HomeStack = createNativeStackNavigator();
   const IdeasStack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
   // const SignInStack = createNativeStackNavigator();
@@ -76,6 +78,19 @@ export default function App() {
   //     </SignInStack.Navigator>
   //   )
   // }
+
+  function HomeStackScreen() {
+    return (
+      <HomeStack.Navigator>
+        <HomeStack.Screen name="Home" component={Home} options={{
+          headerShown: false
+        }} />
+        <HomeStack.Screen name="Sharing" component={Sharing} options={{
+          headerShown: true
+        }} />
+      </HomeStack.Navigator>
+    )
+  }
 
   function IdeasStackScreen() {
     return (
@@ -105,7 +120,7 @@ export default function App() {
         >
         <Tab.Screen 
           name="Home" 
-          component={Home} 
+          component={HomeStackScreen} 
           initialParams={state.userInfo}
           options={{
             headerShown: false,
