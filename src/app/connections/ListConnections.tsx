@@ -118,7 +118,7 @@ export default function ListConnections({ route, navigation }: any) {
     const ideasList = () => {
         return state.connections.map((item, index) =>
             // <SwipeableItem id={item} key={index}></SwipeableItem>
-            <Text>test</Text>
+            <SwipeableItem key={index} id={item} title={item} description="" icon="account"></SwipeableItem>
         );
     }
 

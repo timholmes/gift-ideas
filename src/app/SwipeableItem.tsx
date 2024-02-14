@@ -13,7 +13,7 @@ export type Props = {
     id: string | undefined,
     title: string,
     description: string,
-    icon: string
+    icon: string    // icon of one of the following names from material community icons: https://pictogrammers.com/library/mdi/ 
 }
 
 export function SwipeableItem({ id, title, description, icon }: Props) {
@@ -53,7 +53,7 @@ export function SwipeableItem({ id, title, description, icon }: Props) {
             <List.Item
                 key={id}
                 title={title}
-                description={description || '-no description-'}
+                description={description}
                 left={props => <List.Icon {...props} icon={icon || "" } />}
                 id={id}
                 onPress={() => DeviceEventEmitter.emit(SwipeableItemEvents.ITEM_PRESS, id)}
