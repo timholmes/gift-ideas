@@ -17,6 +17,7 @@ import MyIdeas from './src/app/ideas/MyIdeas';
 import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 import { Test1, Test2 } from './spec/auth/StubUsers';
 import { Sharing } from './src/app/permissions/Sharing';
+import ListConnections from './src/app/connections/ListConnections';
 
 GoogleSignin.configure();  // required - initializes the native config
 
@@ -65,6 +66,7 @@ export default function App() {
 
   const HomeStack = createNativeStackNavigator();
   const IdeasStack = createNativeStackNavigator();
+  const ConnectionsStack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
   // const SignInStack = createNativeStackNavigator();
 
@@ -85,9 +87,6 @@ export default function App() {
         <HomeStack.Screen name="Home" component={Home} options={{
           headerShown: false
         }} />
-        <HomeStack.Screen name="Sharing" component={Sharing} options={{
-          headerShown: true
-        }} />
       </HomeStack.Navigator>
     )
   }
@@ -100,6 +99,17 @@ export default function App() {
         }} />
         <IdeasStack.Screen name="AddIdea" component={AddIdea} options={{ title: "Idea"}}/>
       </IdeasStack.Navigator>
+    )
+  }
+
+  function ConnectionsStackScreens() {
+    return (
+      <ConnectionsStack.Navigator>
+        <ConnectionsStack.Screen name="Connect" component={ListConnections} options={{
+          headerShown: false
+        }} />
+        {/* <ConnectionsStack.Screen name="AddIdea" component={AddIdea} options={{ title: "Idea"}}/> */}
+      </ConnectionsStack.Navigator>
     )
   }
 
@@ -150,6 +160,17 @@ export default function App() {
             tabBarLabel: 'Give',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="wallet-giftcard" color={color} size={size} />
+            )
+          }}>
+        </Tab.Screen>
+        <Tab.Screen 
+          name="Connections" 
+          initialParams={state.userInfo}
+          component={ConnectionsStackScreens}
+          options={{
+            tabBarLabel: 'Connect',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="handshake-outline" color={color} size={size} />
             )
           }}>
         </Tab.Screen>
