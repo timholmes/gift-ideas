@@ -8,7 +8,7 @@ import { AnimatedFAB } from "react-native-paper";
 import { UserContext } from "../AppContext";
 import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
-import { SwipeableIdea, SwipeableIdeaEvents } from "./SwipeableIdea";
+import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
 
 const ideas: Idea[] = [];
 const initialState = {
@@ -26,8 +26,8 @@ export default function MyIdeas({ route, navigation }: any) {
     }
 
     useEffect(() => {
-        DeviceEventEmitter.addListener(SwipeableIdeaEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) })
-        DeviceEventEmitter.addListener(SwipeableIdeaEvents.ITEM_PRESS, (idea: Idea) => { handleItemPress(idea) })
+        DeviceEventEmitter.addListener(SwipeableItemEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) })
+        DeviceEventEmitter.addListener(SwipeableItemEvents.ITEM_PRESS, (idea: Idea) => { handleItemPress(idea) })
     
         return () => {
           DeviceEventEmitter.removeAllListeners();
@@ -130,7 +130,7 @@ export default function MyIdeas({ route, navigation }: any) {
 
     const ideasList = () => {
         return state.ideas.map((idea, index) =>
-            <SwipeableIdea idea={idea} key={index}></SwipeableIdea>
+            <SwipeableItem key={index} id={idea.id} title={idea.title} description={idea.description} icon="lightbulb"></SwipeableItem>
         );
     }
 

@@ -4,15 +4,14 @@ import { Firestore, QuerySnapshot, collection, deleteDoc, doc, getDoc, getDocs }
 import { useCallback, useContext, useEffect, useState } from "react";
 import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { AnimatedFAB } from "react-native-paper";
+import { AnimatedFAB, Text } from "react-native-paper";
 import { UserContext } from "../AppContext";
 import { Idea, Sharing } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
-import { SwipeableIdea, SwipeableIdeaEvents } from "../ideas/SwipeableIdea";
+import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
 
-const ideas: Idea[] = [];
 const initialState = {
-    ideas: ideas
+    connections: []
 }
 
 export default function ListConnections({ route, navigation }: any) {
@@ -26,8 +25,8 @@ export default function ListConnections({ route, navigation }: any) {
     }
 
     useEffect(() => {
-        DeviceEventEmitter.addListener(SwipeableIdeaEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) })
-        DeviceEventEmitter.addListener(SwipeableIdeaEvents.ITEM_PRESS, (idea: Idea) => { handleItemPress(idea) })
+        // DeviceEventEmitter.addListener(SwipeableIdeaEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) })
+        // DeviceEventEmitter.addListener(SwipeableIdeaEvents.ITEM_PRESS, (idea: Idea) => { navigation.navigate('AddIdea', { idea: idea} ) })
     
         return () => {
           DeviceEventEmitter.removeAllListeners();
@@ -90,52 +89,36 @@ export default function ListConnections({ route, navigation }: any) {
                     console.error('Cannot read users document.', error)
                     return;
                 }
-                let x: any = userDocument.data()
+                let viewUsers: any = userDocument.data()?.users
 
-                console.log(x.users[0]);
-
-                // querySnapshot.forEach((doc) => {
-
-                //     let sharing: Sharing = {
-                //         id: doc.id,
-                //         title: doc.data().title,
-                //         description: doc.data().description
-                //     }
-                //     newIdeas.push(idea)
-                // });
-
-                // setState({ ...state, ideas: newIdeas });
-     
-                // userContext.ideas = newIdeas;
+                setState({ ...state, connections: viewUsers})
+                userContext.connections = viewUsers;
             }
 
         }
     }
     
-    async function handleDeletePress(swipeable: Swipeable) {
-        const id: string | undefined = swipeable?.props?.id?.toString()
-        if (id && userContext.userInfo?.email) {
+    // async function handleDeletePress(swipeable: Swipeable) {
+    //     const id: string | undefined = swipeable?.props?.id?.toString()
+    //     if (id && userContext.userInfo?.email) {
 
-            db = FirebaseUtils.getFirestoreDatabase();
-            try {
-                console.log(userContext.userInfo?.email);
-                const ideaDocRef = doc(db, "users", userContext.userInfo?.email, "ideas", id)
-                await deleteDoc(ideaDocRef);
+    //         db = FirebaseUtils.getFirestoreDatabase();
+    //         try {
+    //             console.log(userContext.userInfo?.email);
+    //             const ideaDocRef = doc(db, "users", userContext.userInfo?.email, "ideas", id)
+    //             await deleteDoc(ideaDocRef);
 
-                onLoad(false)
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    }
-
-    const handleItemPress = (idea: any) => {
-        navigation.navigate('AddIdea', { idea: idea})
-    }
+    //             onLoad(false)
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     }
+    // }
 
     const ideasList = () => {
-        return state.ideas.map((idea, index) =>
-            <SwipeableIdea idea={idea} key={index}></SwipeableIdea>
+        return state.connections.map((item, index) =>
+            // <SwipeableItem id={item} key={index}></SwipeableItem>
+            <Text>test</Text>
         );
     }
 

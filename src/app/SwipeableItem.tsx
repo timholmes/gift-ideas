@@ -2,19 +2,21 @@ import { useEffect } from "react";
 import { DeviceEventEmitter, Text, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { List } from "react-native-paper";
-import { Idea } from "../Types";
 
-export enum SwipeableIdeaEvents {
+export enum SwipeableItemEvents {
     DELETE_PRESS = "event.deletePress",
     ITEM_PRESS = "event.itemPress"
 }
 
 // local only to this widget
 export type Props = {
-    idea: Idea
+    id: string | undefined,
+    title: string,
+    description: string,
+    icon: string
 }
 
-export function SwipeableIdea({ idea }: Props) {
+export function SwipeableItem({ id, title, description, icon }: Props) {
 
     const rightSwipeActions = (progressAnimatedValue: any, dragAnimatedValue: any, swipeable: Swipeable) => {
         return (
@@ -27,7 +29,7 @@ export function SwipeableIdea({ idea }: Props) {
             >
                 <Text
                     onPress={() => {
-                        DeviceEventEmitter.emit(SwipeableIdeaEvents.DELETE_PRESS, swipeable);
+                        DeviceEventEmitter.emit(SwipeableItemEvents.DELETE_PRESS, swipeable);
                     }}
                     style={{
                         color: '#1b1a17',
@@ -44,17 +46,17 @@ export function SwipeableIdea({ idea }: Props) {
 
 
     return (
-        <Swipeable key={idea.id}
-                    id={idea.id}
+        <Swipeable key={id}
+                    id={id}
                     renderRightActions={rightSwipeActions}
         >
             <List.Item
-                key={idea.id}
-                title={idea.title}
-                description={idea.description || '-no description-'}
-                left={props => <List.Icon {...props} icon="lightbulb" />}
-                id={idea.id}
-                onPress={() => DeviceEventEmitter.emit(SwipeableIdeaEvents.ITEM_PRESS, idea)}
+                key={id}
+                title={title}
+                description={description || '-no description-'}
+                left={props => <List.Icon {...props} icon={icon || "" } />}
+                id={id}
+                onPress={() => DeviceEventEmitter.emit(SwipeableItemEvents.ITEM_PRESS, id)}
             />
         </Swipeable>
     )

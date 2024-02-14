@@ -4,7 +4,8 @@ type ApplicationState = {
     isSignedIn: boolean,
     userInfo?: User,
     userMessage?: string,
-    ideas: Idea[]
+    ideas: Idea[],
+    connections: []
 }
 export declare interface User {
     firstName: string,
@@ -33,5 +34,6 @@ export declare interface Relative {
 export const initialContext: ApplicationState = {
     isLoading: true,
     isSignedIn: false,
-    ideas: []
+    ideas: [],
+    connections: []
 }
