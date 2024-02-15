@@ -5,7 +5,7 @@ type ApplicationState = {
     userInfo?: User,
     userMessage?: string,
     ideas: Idea[],
-    connections: []
+    connections: string[]
 }
 export declare interface User {
     firstName: string,

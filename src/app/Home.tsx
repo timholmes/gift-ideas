@@ -1,18 +1,18 @@
 import { useContext } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { UserContext } from "./AppContext";
+import { AppContext } from "./AppContext";
 import { Button } from "react-native-paper";
 
 export default function Home({ route, navigation}: any) {
 
-  const userContext = useContext(UserContext);
+  const appContext = useContext(AppContext);
 
   return (
     <SafeAreaView style={styles.container}>
       <View>
         <Text style={styles.welcome}>
-          Welcome, {userContext.userInfo?.firstName}.
+          Welcome, {appContext.userInfo?.firstName}.
           {'\n'}
         </Text>
         <Text style={styles.title}>

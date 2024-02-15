@@ -1,28 +1,22 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { FirebaseError } from "firebase/app";
-import { Firestore, QuerySnapshot, collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
+import { Firestore } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { AnimatedFAB, Text } from "react-native-paper";
-import { UserContext } from "../AppContext";
-import { Idea, Sharing } from "../Types";
-import { FirebaseUtils } from "../util/FirebaseUtils";
-import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
+import { AnimatedFAB } from "react-native-paper";
+import { AppContext } from "../AppContext";
+import { SwipeableItem } from "../SwipeableItem";
+import { findAllConnections } from "./ConnectionsService";
 
+let initConnections: string[] = []
 const initialState = {
-    connections: []
+    connections: initConnections
 }
 
 export default function ListConnections({ route, navigation }: any) {
-    const userContext = useContext(UserContext);
+    const appContext = useContext(AppContext);
     const [state, setState] = useState(initialState)
 
     let db: Firestore;
-
-    enum FirestoreErrorCodes {
-        PERMISSION_DENIED = 'permission-denied'
-    }
 
     useEffect(() => {
         // DeviceEventEmitter.addListener(SwipeableIdeaEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) })
@@ -52,47 +46,24 @@ export default function ListConnections({ route, navigation }: any) {
 
         if (useContext) {
 
-            setState({ ...userContext });
+            setState( { ...appContext });
 
         } else {    // reload data from firebase
-
-            console.log('not using cache');
-
-            db = FirebaseUtils.getFirestoreDatabase();
-
+            
             // TODO: show a a critical error and force login
-            if (!userContext.userInfo) {
-                console.error("Unexpected userInfo is empty.")
+            if (!appContext.userInfo) {
+                console.error("Unexpected userInfo is empty.");
                 return;
             }
 
-            // TODO: simplify firestore query to path based
-            let docRef = undefined;
             try {
-                docRef = doc(db, "users", userContext.userInfo.email, "sharing", "view")
-            } catch (error) {
-                console.log('Unable to get users document reference.', error);
-            }
-
-            console.log('got doc');
-            
-            if (docRef != undefined) {
-                let userDocument = null;
-                try {
-                    userDocument = await getDoc(docRef) // do this to determine permission?
-
-                } catch (error: any) {
-                    if (error instanceof FirebaseError && error.code == FirestoreErrorCodes.PERMISSION_DENIED) {
-                        console.log('Permission denied accessing user document.');
-                    }
-
-                    console.error('Cannot read users document.', error)
-                    return;
-                }
-                let viewUsers: any = userDocument.data()?.users
+                let viewUsers: string[] = await findAllConnections(appContext.userInfo.email)
 
                 setState({ ...state, connections: viewUsers})
-                userContext.connections = viewUsers;
+                appContext.connections = viewUsers;
+                
+            } catch (error) {
+                console.error("Cannot get list of connections", error);
             }
 
         }

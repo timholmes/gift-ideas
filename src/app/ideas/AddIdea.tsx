@@ -4,14 +4,14 @@ import { useContext, useEffect, useState } from 'react';
 import { GestureResponderEvent, View } from "react-native";
 import { Button, Portal, Snackbar, Text, TextInput } from "react-native-paper";
 import * as Yup from 'yup';
-import { UserContext } from '../AppContext';
+import { AppContext } from '../AppContext';
 import { FirebaseUtils } from '../util/FirebaseUtils';
 import { Idea } from '../Types';
 
 export function AddIdea({route, navigation }: any) {
 
     const db = FirebaseUtils.getFirestoreDatabase();
-    const userContext = useContext(UserContext);
+    const appContext = useContext(AppContext);
     const [state, setState] = useState({ showError: false, errorMessage: '', mode: "ADD", idea: {
         id: '',
         title: '',
@@ -36,7 +36,7 @@ export function AddIdea({route, navigation }: any) {
                 // validationSchema={validationSchema}
                 enableReinitialize={true}
                 onSubmit={async values => {
-                    if (!userContext.userInfo) {
+                    if (!appContext.userInfo) {
                         setState({ ...state, showError: true, errorMessage: 'Error saving your ideas.  Please login again.' })
                     } else {
                         
@@ -44,10 +44,10 @@ export function AddIdea({route, navigation }: any) {
 
                         let newIdea: Idea = { title: values.title, description: values.description };
                         try {
-                            const docRef = await addDoc(collection(db, "users", userContext.userInfo.email, "ideas"), newIdea);
+                            const docRef = await addDoc(collection(db, "users", appContext.userInfo.email, "ideas"), newIdea);
                             newIdea.id = docRef.id
 
-                            userContext.ideas.push(newIdea);
+                            appContext.ideas.push(newIdea);
                         } catch (error) {
                             setState({ ...state, showError: true, errorMessage: 'Error saving your ideas.' })
                             console.error(error);

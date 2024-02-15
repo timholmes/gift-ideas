@@ -5,7 +5,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { AnimatedFAB } from "react-native-paper";
-import { UserContext } from "../AppContext";
+import { AppContext } from "../AppContext";
 import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
@@ -16,7 +16,7 @@ const initialState = {
 }
 
 export default function MyIdeas({ route, navigation }: any) {
-    const userContext = useContext(UserContext);
+    const appContext = useContext(AppContext);
     const [state, setState] = useState(initialState)
 
     let db: Firestore;
@@ -53,7 +53,7 @@ export default function MyIdeas({ route, navigation }: any) {
 
         if (useContext) {
 
-            setState({ ...userContext });
+            setState({ ...appContext });
 
         } else {    // reload data from firebase
 
@@ -61,14 +61,14 @@ export default function MyIdeas({ route, navigation }: any) {
             db = FirebaseUtils.getFirestoreDatabase();
 
             // TODO: show a a critical error and force login
-            if (!userContext.userInfo) {
+            if (!appContext.userInfo) {
                 return;
             }
 
             // TODO: simplify firestore query to path based
             let docRef = undefined;
             try {
-                docRef = doc(db, "users", userContext.userInfo.email)
+                docRef = doc(db, "users", appContext.userInfo.email)
             } catch (error) {
                 console.log('Unable to get users document reference.', error);
             }
@@ -101,7 +101,7 @@ export default function MyIdeas({ route, navigation }: any) {
 
                 setState({ ...state, ideas: newIdeas });
      
-                userContext.ideas = newIdeas;
+                appContext.ideas = newIdeas;
             }
 
         }
@@ -109,12 +109,12 @@ export default function MyIdeas({ route, navigation }: any) {
     
     async function handleDeletePress(swipeable: Swipeable) {
         const id: string | undefined = swipeable?.props?.id?.toString()
-        if (id && userContext.userInfo?.email) {
+        if (id && appContext.userInfo?.email) {
 
             db = FirebaseUtils.getFirestoreDatabase();
             try {
-                console.log(userContext.userInfo?.email);
-                const ideaDocRef = doc(db, "users", userContext.userInfo?.email, "ideas", id)
+                console.log(appContext.userInfo?.email);
+                const ideaDocRef = doc(db, "users", appContext.userInfo?.email, "ideas", id)
                 await deleteDoc(ideaDocRef);
 
                 onLoad(false)

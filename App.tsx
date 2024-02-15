@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { DeviceEventEmitter, LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
-import { UserContext } from './src/app/AppContext';
+import { AppContext } from './src/app/AppContext';
 import Home from './src/app/Home';
 import { initialContext } from './src/app/Types';
 import { SignInEvents } from './src/app/auth/SignIn';
@@ -180,14 +180,14 @@ export default function App() {
 
   return (
     <PaperProvider>
-      <UserContext.Provider value={state}>
+      <AppContext.Provider value={state}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <NavigationContainer>
             {/* <SignInStackScreen/> */}
             <MainTabs />
           </NavigationContainer>
         </GestureHandlerRootView>
-      </UserContext.Provider>
+      </AppContext.Provider>
     </PaperProvider>
   );
 }
