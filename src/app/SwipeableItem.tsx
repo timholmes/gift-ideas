@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { DeviceEventEmitter, Text, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { List } from "react-native-paper";
@@ -13,10 +12,11 @@ export type Props = {
     id: string | undefined,
     title: string,
     description: string,
-    icon: string    // icon of one of the following names from material community icons: https://pictogrammers.com/library/mdi/ 
+    icon: string,    // icon of one of the following names from material community icons: https://pictogrammers.com/library/mdi/
+    data: any
 }
 
-export function SwipeableItem({ id, title, description, icon }: Props) {
+export function SwipeableItem({ id, title, description, icon, data }: Props) {
 
     const rightSwipeActions = (progressAnimatedValue: any, dragAnimatedValue: any, swipeable: Swipeable) => {
         return (
@@ -56,7 +56,7 @@ export function SwipeableItem({ id, title, description, icon }: Props) {
                 description={description}
                 left={props => <List.Icon {...props} icon={icon || "" } />}
                 id={id}
-                onPress={() => DeviceEventEmitter.emit(SwipeableItemEvents.ITEM_PRESS, id)}
+                onPress={() => DeviceEventEmitter.emit(SwipeableItemEvents.ITEM_PRESS, data)}
             />
         </Swipeable>
     )

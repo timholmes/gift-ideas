@@ -130,7 +130,7 @@ export default function MyIdeas({ route, navigation }: any) {
 
     const ideasList = () => {
         return state.ideas.map((idea, index) =>
-            <SwipeableItem key={index} id={idea.id} title={idea.title} description={idea.description} icon="lightbulb"></SwipeableItem>
+            <SwipeableItem key={index} id={idea.id} title={idea.title} description={idea.description} data={idea} icon="lightbulb"></SwipeableItem>
         );
     }
 
