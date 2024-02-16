@@ -2,10 +2,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Firestore } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
-import { AnimatedFAB } from "react-native-paper";
+import { AnimatedFAB, Text } from "react-native-paper";
 import { AppContext } from "../AppContext";
 import { SwipeableItem } from "../SwipeableItem";
 import { findAllConnections } from "./ConnectionsService";
+import { crudListStyles } from "../shared/ApplicationStyles";
 
 let initConnections: string[] = []
 const initialState = {
@@ -94,8 +95,9 @@ export default function ListConnections({ route, navigation }: any) {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.list}>
+        <SafeAreaView style={crudListStyles.container}>
+            <View style={crudListStyles.list}>
+                <Text>Below is the list of users that have access to your ideas.</Text>
                 <ScrollView>
                 {ideasList()}
                 </ScrollView>
@@ -107,23 +109,9 @@ export default function ListConnections({ route, navigation }: any) {
                     visible={true}
                     animateFrom={'right'}
                     iconMode={'static'}
-                    style={[styles.fabStyle]}
+                    style={[crudListStyles.fabStyle]}
                 />
             </View>
         </SafeAreaView>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    list: {
-        flexGrow: 1,
-    },
-    fabStyle: {
-        bottom: 0,
-        right: 16,
-        position: 'absolute',
-    },
-});

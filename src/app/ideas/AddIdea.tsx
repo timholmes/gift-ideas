@@ -1,17 +1,15 @@
-import { addDoc, collection } from 'firebase/firestore';
 import { Formik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { GestureResponderEvent, View } from "react-native";
 import { Button, Portal, Snackbar, Text, TextInput } from "react-native-paper";
 import * as Yup from 'yup';
 import { AppContext } from '../AppContext';
-import { FirebaseUtils } from '../util/FirebaseUtils';
 import { Idea } from '../Types';
+import { crudAddStyles } from '../shared/ApplicationStyles';
 import { createIdea } from './IdeasService';
 
 export function AddIdea({route, navigation }: any) {
 
-    const db = FirebaseUtils.getFirestoreDatabase();
     const appContext = useContext(AppContext);
     const [state, setState] = useState({ showError: false, errorMessage: '', mode: "ADD", idea: {
         id: '',
@@ -61,9 +59,9 @@ export function AddIdea({route, navigation }: any) {
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
-                    <View style={{ margin: 10 }}>
+                    <View style={{ ...crudAddStyles.container }}>
                         <TextInput
-                            style={{ margin: 5 }}
+                            style={{ ...crudAddStyles.input }}
                             label="Title"
                             mode="outlined"
                             onChangeText={handleChange('title')}
@@ -72,7 +70,7 @@ export function AddIdea({route, navigation }: any) {
                         />
                         {errors.title ? <Text>{errors.title}</Text> : null}
                         <TextInput
-                            style={{ margin: 5, height: 80 }}
+                            style={{ ...crudAddStyles.input, height: 80 }}
                             label="Description"
                             mode="outlined"
                             multiline

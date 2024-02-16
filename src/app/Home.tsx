@@ -3,46 +3,29 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppContext } from "./AppContext";
 import { Button } from "react-native-paper";
+import { homeStyles } from "./shared/ApplicationStyles";
+
 
 export default function Home({ route, navigation}: any) {
 
   const appContext = useContext(AppContext);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={homeStyles.container}>
       <View>
-        <Text style={styles.welcome}>
+        <Text style={homeStyles.welcome}>
           Welcome, {appContext.userInfo?.firstName}.
           {'\n'}
         </Text>
-        <Text style={styles.title}>
+        <Text style={homeStyles.title}>
           To invite someone to your ideas, click below.
         </Text>
         <Button
           onPress={() => navigation.navigate('Sharing')}
           mode="contained"
-          style={styles.button}
+          style={homeStyles.button}
         >Add</Button>
       </View>
     </SafeAreaView>
   )
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-      flex: 1
-  },
-  welcome: {
-    fontSize: 18
-  },
-  title: {
-    marginVertical: 8,
-    fontSize: 16
-  },
-  button: {
-    width: 100,
-    margin: 10,
-    alignContent: 'center'
-  }
-});

@@ -10,6 +10,7 @@ import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
 import { findAllIdeas } from "./IdeasService";
+import { crudListStyles } from "../shared/ApplicationStyles";
 
 const ideas: Idea[] = [];
 const initialState = {
@@ -106,8 +107,8 @@ export default function MyIdeas({ route, navigation }: any) {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.list}>
+        <SafeAreaView style={crudListStyles.container}>
+            <View style={crudListStyles.list}>
                 <ScrollView>
                 {ideasList()}
                 </ScrollView>
@@ -119,23 +120,9 @@ export default function MyIdeas({ route, navigation }: any) {
                     visible={true}
                     animateFrom={'right'}
                     iconMode={'static'}
-                    style={[styles.fabStyle]}
+                    style={[crudListStyles.fabStyle]}
                 />
             </View>
         </SafeAreaView>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    list: {
-        flexGrow: 1,
-    },
-    fabStyle: {
-        bottom: 0,
-        right: 16,
-        position: 'absolute',
-    },
-});
