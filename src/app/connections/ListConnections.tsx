@@ -4,9 +4,10 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { AnimatedFAB, Text } from "react-native-paper";
 import { AppContext } from "../AppContext";
-import { SwipeableItem } from "../SwipeableItem";
+import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
 import { findAllConnections } from "./ConnectionsService";
 import { crudListStyles } from "../shared/ApplicationStyles";
+import { Swipeable } from "react-native-gesture-handler";
 
 let initConnections: string[] = []
 const initialState = {
@@ -20,8 +21,8 @@ export default function ListConnections({ route, navigation }: any) {
     let db: Firestore;
 
     useEffect(() => {
-        // DeviceEventEmitter.addListener(SwipeableIdeaEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) })
-        // DeviceEventEmitter.addListener(SwipeableIdeaEvents.ITEM_PRESS, (idea: Idea) => { navigation.navigate('AddIdea', { idea: idea} ) })
+        DeviceEventEmitter.addListener(SwipeableItemEvents.DELETE_PRESS, (swipeable: Swipeable) => { });
+        DeviceEventEmitter.addListener(SwipeableItemEvents.ITEM_PRESS, (swipeable: Swipeable) => { });  // catch it but do nothing 
     
         return () => {
           DeviceEventEmitter.removeAllListeners();
