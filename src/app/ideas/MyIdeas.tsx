@@ -9,6 +9,7 @@ import { AppContext } from "../AppContext";
 import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
+import { findAllIdeas } from "./IdeasService";
 
 const ideas: Idea[] = [];
 const initialState = {
@@ -57,53 +58,23 @@ export default function MyIdeas({ route, navigation }: any) {
 
         } else {    // reload data from firebase
 
-            console.log('getting ideas from firebase');
-            db = FirebaseUtils.getFirestoreDatabase();
-
             // TODO: show a a critical error and force login
             if (!appContext.userInfo) {
+                console.error('User info is missing.')
                 return;
             }
 
             // TODO: simplify firestore query to path based
-            let docRef = undefined;
+            let allIdeas: Idea[] = [];
             try {
-                docRef = doc(db, "users", appContext.userInfo.email)
+                allIdeas = await findAllIdeas(appContext.userInfo.email)
             } catch (error) {
-                console.log('Unable to get users document reference.', error);
+                console.error("Error getting idea list.", error)
             }
 
-            if (docRef != undefined) {
-                let userDocument = null;
-                try {
-                    userDocument = await getDoc(docRef) // do this to determine permission?
-                } catch (error: any) {
-                    if (error instanceof FirebaseError && error.code == FirestoreErrorCodes.PERMISSION_DENIED) {
-                        console.log('Permission denied accessing user document.');
-                    }
-
-                    console.error('Cannot read users document.', error)
-                    return;
-                }
-
-                let querySnapshot: QuerySnapshot = await getDocs(collection(docRef, "ideas"));
-
-                let newIdeas: Idea[] = [];
-                querySnapshot.forEach((doc) => {
-
-                    let idea: Idea = {
-                        id: doc.id,
-                        title: doc.data().title,
-                        description: doc.data().description
-                    }
-                    newIdeas.push(idea)
-                });
-
-                setState({ ...state, ideas: newIdeas });
-     
-                appContext.ideas = newIdeas;
-            }
-
+            setState({ ...state, ideas: allIdeas });
+    
+            appContext.ideas = allIdeas;
         }
     }
     
