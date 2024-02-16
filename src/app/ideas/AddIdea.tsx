@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { AppContext } from '../AppContext';
 import { FirebaseUtils } from '../util/FirebaseUtils';
 import { Idea } from '../Types';
+import { createIdea } from './IdeasService';
 
 export function AddIdea({route, navigation }: any) {
 
@@ -40,17 +41,18 @@ export function AddIdea({route, navigation }: any) {
                         setState({ ...state, showError: true, errorMessage: 'Error saving your ideas.  Please login again.' })
                     } else {
                         
-                        FirebaseUtils.getFirestoreDatabase()
-
                         let newIdea: Idea = { title: values.title, description: values.description };
+                        
                         try {
-                            const docRef = await addDoc(collection(db, "users", appContext.userInfo.email, "ideas"), newIdea);
+                            const docRef = await createIdea(appContext.userInfo.email, newIdea);
                             newIdea.id = docRef.id
 
                             appContext.ideas.push(newIdea);
+                            
                         } catch (error) {
-                            setState({ ...state, showError: true, errorMessage: 'Error saving your ideas.' })
                             console.error(error);
+                            
+                            setState({ ...state, showError: true, errorMessage: 'Error saving your ideas.' })
                             return;
                         }
 

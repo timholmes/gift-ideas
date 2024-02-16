@@ -1,4 +1,4 @@
-import { Firestore, QuerySnapshot, collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { DocumentData, DocumentReference, Firestore, QuerySnapshot, addDoc, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 
@@ -33,5 +33,12 @@ export async function findAllIdeas(email: string): Promise<Idea[]> {
     });
 
     return newIdeas;
+}
 
+export async function createIdea(email: string, newIdea: Idea): Promise<DocumentReference<DocumentData, DocumentData>> {
+
+    const db: Firestore = FirebaseUtils.getFirestoreDatabase();
+    const docRef = await addDoc(collection(db, "users", email, "ideas"), newIdea);
+
+    return docRef;
 }
