@@ -1,3 +1,3 @@
-#!/usr/sh
+#!/bin/zsh
 
 firebase deploy --only firestore:rules
