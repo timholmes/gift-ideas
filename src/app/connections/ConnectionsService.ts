@@ -1,4 +1,4 @@
-import { Firestore, doc, getDoc } from "firebase/firestore";
+import { DocumentData, DocumentReference, Firestore, arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 
 export enum FirestoreErrorCodes {
@@ -23,4 +23,15 @@ export async function findAllConnections(email: string): Promise<string[]> {
 
         userDocument = await getDoc(docRef) // do this to determine permission?
         return userDocument.data()?.users
+}
+
+export async function addConnectionEmail(email: string, connectionEmail: string): Promise<DocumentReference<DocumentData, DocumentData>> {
+    const db: Firestore = FirebaseUtils.getFirestoreDatabase();
+
+    const docRef = doc(db, "users", email, "sharing", "view");
+    await updateDoc(docRef, {
+        users: arrayUnion(connectionEmail)
+    });
+
+    return docRef;
 }

@@ -18,6 +18,7 @@ import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 import { Test1, Test2 } from './spec/auth/StubUsers';
 import { Sharing } from './src/app/permissions/Sharing';
 import ListConnections from './src/app/connections/ListConnections';
+import { AddConnection } from './src/app/connections/AddConnection';
 
 GoogleSignin.configure();  // required - initializes the native config
 
@@ -106,9 +107,9 @@ export default function App() {
     return (
       <ConnectionsStack.Navigator>
         <ConnectionsStack.Screen name="Connect" component={ListConnections} options={{
-          headerShown: false
+            headerShown: false
         }} />
-        {/* <ConnectionsStack.Screen name="AddIdea" component={AddIdea} options={{ title: "Idea"}}/> */}
+        <ConnectionsStack.Screen name="AddConnection" component={AddConnection} options={{ title: "Add Connection"}}/>
       </ConnectionsStack.Navigator>
     )
   }
@@ -168,6 +169,7 @@ export default function App() {
           initialParams={state.userInfo}
           component={ConnectionsStackScreens}
           options={{
+            headerShown: false,
             tabBarLabel: 'Connect',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="handshake-outline" color={color} size={size} />

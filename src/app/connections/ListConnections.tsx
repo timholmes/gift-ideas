@@ -4,25 +4,29 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { AnimatedFAB, Text } from "react-native-paper";
 import { AppContext } from "../AppContext";
-import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
+import { SwipeableItem, SwipeableItemEvents } from "../shared/SwipeableItem";
 import { findAllConnections } from "./ConnectionsService";
 import { crudListStyles } from "../shared/ApplicationStyles";
 import { Swipeable } from "react-native-gesture-handler";
+import { Sharing, initialContext } from "../Types";
 
-let initConnections: string[] = []
-const initialState = {
-    connections: initConnections
-}
+// const initialState = {
+//     sharing: {
+//         view: {
+//             users: []
+//         }
+//     }
+// }
 
 export default function ListConnections({ route, navigation }: any) {
     const appContext = useContext(AppContext);
-    const [state, setState] = useState(initialState)
+    const [state, setState] = useState(initialContext)
 
     let db: Firestore;
 
     useEffect(() => {
         DeviceEventEmitter.addListener(SwipeableItemEvents.DELETE_PRESS, (swipeable: Swipeable) => { });
-        DeviceEventEmitter.addListener(SwipeableItemEvents.ITEM_PRESS, (swipeable: Swipeable) => { });  // catch it but do nothing 
+        DeviceEventEmitter.addListener(SwipeableItemEvents.ITEM_PRESS, (swipeable: Swipeable) => { return;});  // catch it but do nothing 
     
         return () => {
           DeviceEventEmitter.removeAllListeners();
@@ -61,8 +65,13 @@ export default function ListConnections({ route, navigation }: any) {
             try {
                 let viewUsers: string[] = await findAllConnections(appContext.userInfo.email)
 
-                setState({ ...state, connections: viewUsers})
-                appContext.connections = viewUsers;
+                let sharing: Sharing = {
+                    view: {
+                        users: viewUsers
+                    }
+                }
+                setState({ ...state, sharing: sharing})
+                appContext.sharing = sharing;
                 
             } catch (error) {
                 console.error("Cannot get list of connections", error);
@@ -89,7 +98,7 @@ export default function ListConnections({ route, navigation }: any) {
     // }
 
     const ideasList = () => {
-        return state.connections.map((item, index) =>
+        return state.sharing.view.users.map((item, index) =>
             // <SwipeableItem id={item} key={index}></SwipeableItem>
             <SwipeableItem key={index} id={item} title={item} description="" data="item" icon="account"></SwipeableItem>
         );
@@ -106,7 +115,7 @@ export default function ListConnections({ route, navigation }: any) {
                     icon={'plus'}
                     label={'Label'}
                     extended={false}
-                    onPress={() => navigation.navigate('AddIdea')}
+                    onPress={() => navigation.navigate('AddConnection')}
                     visible={true}
                     animateFrom={'right'}
                     iconMode={'static'}

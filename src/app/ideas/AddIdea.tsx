@@ -15,7 +15,7 @@ export function AddIdea({route, navigation }: any) {
         id: '',
         title: '',
         description: ''
-    } })
+    } });
 
     useEffect(() => {
         if (route.params?.idea) {

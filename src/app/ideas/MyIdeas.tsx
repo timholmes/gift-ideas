@@ -8,7 +8,7 @@ import { AnimatedFAB } from "react-native-paper";
 import { AppContext } from "../AppContext";
 import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
-import { SwipeableItem, SwipeableItemEvents } from "../SwipeableItem";
+import { SwipeableItem, SwipeableItemEvents } from "../shared/SwipeableItem";
 import { findAllIdeas } from "./IdeasService";
 import { crudListStyles } from "../shared/ApplicationStyles";
 
