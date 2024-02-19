@@ -9,7 +9,7 @@ import { AppContext } from "../AppContext";
 import { Idea } from "../Types";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 import { SwipeableItem, SwipeableItemEvents } from "../shared/SwipeableItem";
-import { findAllIdeas } from "./IdeasService";
+import { deleteIdea, findAllIdeas } from "./IdeasService";
 import { crudListStyles } from "../shared/ApplicationStyles";
 
 const ideas: Idea[] = [];
@@ -85,14 +85,14 @@ export default function MyIdeas({ route, navigation }: any) {
 
             db = FirebaseUtils.getFirestoreDatabase();
             try {
-                console.log(appContext.userInfo?.email);
-                const ideaDocRef = doc(db, "users", appContext.userInfo?.email, "ideas", id)
-                await deleteDoc(ideaDocRef);
+                await deleteIdea(appContext.userInfo?.email, id)
 
                 onLoad(false)
             } catch (error) {
                 console.error(error);
             }
+        } else {
+            console.error("Unable to delete idea. Missing id or email")
         }
     }
 
