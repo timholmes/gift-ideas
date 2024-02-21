@@ -5,18 +5,10 @@ import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "
 import { AnimatedFAB, Text } from "react-native-paper";
 import { AppContext } from "../AppContext";
 import { SwipeableItem, SwipeableItemEvents } from "../shared/SwipeableItem";
-import { findAllConnections } from "./ConnectionsService";
+import { deleteConnectionByEmail, findAllConnections } from "./ConnectionsService";
 import { crudListStyles } from "../shared/ApplicationStyles";
 import { Swipeable } from "react-native-gesture-handler";
 import { Sharing, initialContext } from "../Types";
-
-// const initialState = {
-//     sharing: {
-//         view: {
-//             users: []
-//         }
-//     }
-// }
 
 export default function ListConnections({ route, navigation }: any) {
     const appContext = useContext(AppContext);
@@ -25,8 +17,8 @@ export default function ListConnections({ route, navigation }: any) {
     let db: Firestore;
 
     useEffect(() => {
-        DeviceEventEmitter.addListener(SwipeableItemEvents.DELETE_PRESS, (swipeable: Swipeable) => { });
-        DeviceEventEmitter.addListener(SwipeableItemEvents.ITEM_PRESS, (swipeable: Swipeable) => { return;});  // catch it but do nothing 
+        DeviceEventEmitter.addListener(SwipeableItemEvents.DELETE_PRESS, (swipeable: Swipeable) => { handleDeletePress(swipeable) });
+        DeviceEventEmitter.addListener(SwipeableItemEvents.ITEM_PRESS, (swipeable: Swipeable) => { return; });  // catch it but do nothing 
     
         return () => {
           DeviceEventEmitter.removeAllListeners();
@@ -80,27 +72,24 @@ export default function ListConnections({ route, navigation }: any) {
         }
     }
     
-    // async function handleDeletePress(swipeable: Swipeable) {
-    //     const id: string | undefined = swipeable?.props?.id?.toString()
-    //     if (id && userContext.userInfo?.email) {
+    async function handleDeletePress(swipeable: Swipeable) {
+        const emailToDelete = swipeable.props.id;
 
-    //         db = FirebaseUtils.getFirestoreDatabase();
-    //         try {
-    //             console.log(userContext.userInfo?.email);
-    //             const ideaDocRef = doc(db, "users", userContext.userInfo?.email, "ideas", id)
-    //             await deleteDoc(ideaDocRef);
+        if (emailToDelete && appContext.userInfo?.email) {
+            try {
+                await deleteConnectionByEmail(appContext.userInfo.email, emailToDelete)
 
-    //             onLoad(false)
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //     }
-    // }
+                onLoad(false)
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
 
-    const ideasList = () => {
-        return state.sharing.view.users.map((item, index) =>
+    const connectionsList = () => {
+        return state.sharing.view.users.map((email, index) =>
             // <SwipeableItem id={item} key={index}></SwipeableItem>
-            <SwipeableItem key={index} id={item} title={item} description="" data="item" icon="account"></SwipeableItem>
+            <SwipeableItem key={index} id={email} title={email} description="" data="item" icon="account"></SwipeableItem>
         );
     }
 
@@ -109,7 +98,7 @@ export default function ListConnections({ route, navigation }: any) {
             <View style={crudListStyles.list}>
                 <Text>Below is the list of users that have access to your ideas.</Text>
                 <ScrollView>
-                {ideasList()}
+                {connectionsList()}
                 </ScrollView>
                 <AnimatedFAB
                     icon={'plus'}

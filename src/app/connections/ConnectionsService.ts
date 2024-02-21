@@ -1,4 +1,4 @@
-import { DocumentData, DocumentReference, Firestore, arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { DocumentData, DocumentReference, Firestore, arrayRemove, arrayUnion, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { FirebaseUtils } from "../util/FirebaseUtils";
 
 export enum FirestoreErrorCodes {
@@ -34,4 +34,12 @@ export async function addConnectionEmail(email: string, connectionEmail: string)
     });
 
     return docRef;
+}
+
+export async function deleteConnectionByEmail(userEmail: string, connectionEmail: string) {
+    const db: Firestore = FirebaseUtils.getFirestoreDatabase();
+    const docRef = doc(db, "users", userEmail, "sharing", "view")
+    await updateDoc(docRef, {
+        users: arrayRemove(connectionEmail)
+    });
 }
