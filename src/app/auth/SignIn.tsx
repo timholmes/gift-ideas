@@ -14,11 +14,18 @@ const initialState = {
   reSignInSuccess: false
 }
 
-export default function SignIn() {
+export default function SignIn({ route, navigation}: any) {
   const [state, setState] = useState(initialState)
 
   useEffect(() => {
+
+    if(FirebaseUtils.isLocal()) {
+      navigation.navigate("SignInStub");
+      return;
+    }
+
     attemptReSignIn();
+    console.log('sign in');
   }, [])
 
   async function attemptReSignIn() {
@@ -31,6 +38,7 @@ export default function SignIn() {
       try {
         googleUser = await GoogleSignin.getCurrentUser();
       } catch (e) {
+        console.error(`Error getting current user.`)
         setState({ ...initialState, attemptingReSignin: false, reSignInSuccess: false });
         return;
       }
@@ -39,7 +47,7 @@ export default function SignIn() {
         setState({ ...initialState, attemptingReSignin: false, reSignInSuccess: false });
         return;
       }
-      
+
       setState({ ...initialState, attemptingReSignin: true, reSignInSuccess: true });
 
       const user: User = buildUserFromGoogleUser(googleUser);

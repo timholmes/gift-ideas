@@ -1,11 +1,18 @@
 import { StyleSheet } from "react-native";
 
-
-export const crudListStyles = StyleSheet.create({
+export const siteStyles = StyleSheet.create({
     container: {
         flex: 1,
         margin: 10
     },
+    primaryButton: {
+        width: 100,
+        alignContent: 'center'
+    }
+})
+
+export const crudListStyles = StyleSheet.create({
+    ...siteStyles,
     list: {
         flexGrow: 1,
     },

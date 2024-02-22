@@ -7,18 +7,18 @@ import { useEffect, useState } from 'react';
 import { DeviceEventEmitter, LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
+import { Test2 } from './spec/auth/StubUsers';
 import { AppContext } from './src/app/AppContext';
 import Home from './src/app/Home';
 import { initialContext } from './src/app/Types';
-import { SignInEvents } from './src/app/auth/SignIn';
+import SignIn, { SignInEvents } from './src/app/auth/SignIn';
 import SignOut, { SignOutEvents } from './src/app/auth/SignOut';
+import { AddConnection } from './src/app/connections/AddConnection';
+import ListConnections from './src/app/connections/ListConnections';
 import { AddIdea } from './src/app/ideas/AddIdea';
 import MyIdeas from './src/app/ideas/MyIdeas';
 import { FirebaseUtils } from './src/app/util/FirebaseUtils';
-import { Test1, Test2 } from './spec/auth/StubUsers';
-import { Sharing } from './src/app/permissions/Sharing';
-import ListConnections from './src/app/connections/ListConnections';
-import { AddConnection } from './src/app/connections/AddConnection';
+import SignInStub from './src/app/auth/SignInStub';
 
 GoogleSignin.configure();  // required - initializes the native config
 
@@ -26,7 +26,7 @@ export default function App() {
   const [state, setState] = useState(initialContext)
 
   LogBox.ignoreAllLogs();
-  
+
   // re-initialize firebase auth state
   useEffect(() => {
     setupEnvironment();
@@ -42,14 +42,14 @@ export default function App() {
   async function setupEnvironment() {
     if (FirebaseUtils.isLocal()) {
       console.log("Environment is 'local'.");
-      await FirebaseUtils.stubSignIn(Test2);
+      // await FirebaseUtils.stubSignIn(Test2);
     }
   }
 
   async function handleSignIn(eventData: any) {
     console.log(`Signin is complete.  Success? ${eventData.success}`);
 
-    if(eventData.success == false) {
+    if (eventData.success == false) {
       setState({ ...initialContext, isLoading: false, isSignedIn: false })
     } else {
       setState({ ...initialContext, isLoading: false, userInfo: eventData.userInfo, isSignedIn: true })
@@ -57,8 +57,8 @@ export default function App() {
   }
 
   function handleSignOut(eventData: any) {
-    if(eventData.success && !eventData.error) {
-      setState({ ...initialContext,isSignedIn: false, isLoading: false });
+    if (eventData.success && !eventData.error) {
+      setState({ ...initialContext, isSignedIn: false, isLoading: false });
     } else {
       setState({ ...initialContext, isSignedIn: false, isLoading: false, userMessage: 'Sign-out failed.' });
     }
@@ -69,18 +69,19 @@ export default function App() {
   const IdeasStack = createNativeStackNavigator();
   const ConnectionsStack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
-  // const SignInStack = createNativeStackNavigator();
+  const SignInStack = createNativeStackNavigator();
 
   // const navigation = useNavigation();
 
 
-  // function SignInStackScreen() {
-  //   return (
-  //     <SignInStack.Navigator>
-  //       <SignInStack.Screen name="SignIn" component={SignIn} />
-  //     </SignInStack.Navigator>
-  //   )
-  // }
+  function SignInStackScreen() {
+    return (
+      <SignInStack.Navigator>
+        <SignInStack.Screen name="SignIn" component={SignIn} />
+        <SignInStack.Screen name="SignInStub" component={ SignInStub } options={{ title: "Sign In Stub" }} />
+      </SignInStack.Navigator>
+    )
+  }
 
   function HomeStackScreen() {
     return (
@@ -98,7 +99,7 @@ export default function App() {
         <IdeasStack.Screen name="MyIdeas" component={MyIdeas} options={{
           headerShown: false
         }} />
-        <IdeasStack.Screen name="AddIdea" component={AddIdea} options={{ title: "Idea"}}/>
+        <IdeasStack.Screen name="AddIdea" component={AddIdea} options={{ title: "Idea" }} />
       </IdeasStack.Navigator>
     )
   }
@@ -107,31 +108,31 @@ export default function App() {
     return (
       <ConnectionsStack.Navigator>
         <ConnectionsStack.Screen name="Connect" component={ListConnections} options={{
-            headerShown: false
+          headerShown: false
         }} />
-        <ConnectionsStack.Screen name="AddConnection" component={AddConnection} options={{ title: "Add Connection"}}/>
+        <ConnectionsStack.Screen name="AddConnection" component={AddConnection} options={{ title: "Add Connection" }} />
       </ConnectionsStack.Navigator>
     )
   }
 
   function MainTabs() {
     return (
-      <Tab.Navigator 
-          screenOptions={{
-            headerRight: () => (
-              state.isSignedIn ? <SignOut></SignOut> : null
-            )
-          }}
-          screenListeners={{
-            state: (e) => {
-              // Do something with the state
-              // console.log('state changed', e.data);
-            },
-          }}
-        >
-        <Tab.Screen 
-          name="Home" 
-          component={HomeStackScreen} 
+      <Tab.Navigator
+        screenOptions={{
+          headerRight: () => (
+            state.isSignedIn ? <SignOut></SignOut> : null
+          )
+        }}
+        screenListeners={{
+          state: (e) => {
+            // Do something with the state
+            // console.log('state changed', e.data);
+          },
+        }}
+      >
+        <Tab.Screen
+          name="Home"
+          component={HomeStackScreen}
           initialParams={state.userInfo}
           options={{
             headerShown: false,
@@ -141,8 +142,8 @@ export default function App() {
             )
           }}>
         </Tab.Screen>
-        <Tab.Screen 
-          name="My Ideas" 
+        <Tab.Screen
+          name="My Ideas"
           initialParams={state.userInfo}
           component={IdeasStackScreen}
           options={{
@@ -153,8 +154,8 @@ export default function App() {
             )
           }}>
         </Tab.Screen>
-        <Tab.Screen 
-          name="Give" 
+        <Tab.Screen
+          name="Give"
           initialParams={state.userInfo}
           component={Home}
           options={{
@@ -164,8 +165,8 @@ export default function App() {
             )
           }}>
         </Tab.Screen>
-        <Tab.Screen 
-          name="Connections" 
+        <Tab.Screen
+          name="Connections"
           initialParams={state.userInfo}
           component={ConnectionsStackScreens}
           options={{
@@ -185,8 +186,8 @@ export default function App() {
       <AppContext.Provider value={state}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <NavigationContainer>
-            {/* <SignInStackScreen/> */}
-            <MainTabs />
+            { FirebaseUtils.isLocal() && !state.isSignedIn && <SignInStackScreen /> }
+            { state.isSignedIn && <MainTabs /> }
           </NavigationContainer>
         </GestureHandlerRootView>
       </AppContext.Provider>
