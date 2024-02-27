@@ -19,6 +19,7 @@ import { AddIdea } from './src/app/ideas/AddIdea';
 import MyIdeas from './src/app/ideas/MyIdeas';
 import { FirebaseUtils } from './src/app/util/FirebaseUtils';
 import SignInStub from './src/app/auth/SignInStub';
+import GiveList from './src/app/give/GiveList';
 
 GoogleSignin.configure();  // required - initializes the native config
 
@@ -68,9 +69,11 @@ export default function App() {
 
   const HomeStack = createNativeStackNavigator();
   const IdeasStack = createNativeStackNavigator();
+  const GiveStack = createNativeStackNavigator();
   const ConnectionsStack = createNativeStackNavigator();
-  const Tab = createBottomTabNavigator();
   const SignInStack = createNativeStackNavigator();
+
+  const Tab = createBottomTabNavigator();
 
   // const navigation = useNavigation();
 
@@ -103,6 +106,17 @@ export default function App() {
     )
   }
 
+  function GiveStackScreen() {
+    return (
+      <GiveStack.Navigator>
+        <GiveStack.Screen name="GiveScreen" component={GiveList} options={{
+          headerShown: false
+        }} />
+        {/* <IdeasStack.Screen name="AddIdea" component={AddIdea} options={{ title: "Idea" }} /> */}
+      </GiveStack.Navigator>
+    )
+  }
+
   function ConnectionsStackScreens() {
     return (
       <ConnectionsStack.Navigator>
@@ -130,7 +144,7 @@ export default function App() {
         }}
       >
         <Tab.Screen
-          name="Home"
+          name="HomeTab"
           component={HomeStackScreen}
           initialParams={state.userInfo}
           options={{
@@ -154,10 +168,11 @@ export default function App() {
           }}>
         </Tab.Screen>
         <Tab.Screen
-          name="Give"
+          name="GiveTab"
           initialParams={state.userInfo}
-          component={Home}
+          component={GiveStackScreen}
           options={{
+            headerShown: false,
             tabBarLabel: 'Give',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="wallet-giftcard" color={color} size={size} />
