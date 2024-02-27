@@ -10,9 +10,9 @@ export enum SignOutEvents {
 export default function SignOut({ signOutListener }: any) {
 
     useEffect(() => {
-        return () => {
-            DeviceEventEmitter.removeAllListeners(SignOutEvents.SIGN_OUT_COMPLETE);
-        };
+        // return () => {
+        //     DeviceEventEmitter.removeAllListeners(SignOutEvents.SIGN_OUT_COMPLETE);
+        // };
     }, []);
 
     function signOut() {

@@ -2,8 +2,8 @@ import { DeviceEventEmitter, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import { Test1, Test2 } from "../../../spec/auth/StubUsers";
 import { User } from "../Types";
+import { siteStyles } from "../shared/ApplicationStyles";
 import { FirebaseUtils } from "../util/FirebaseUtils";
-import { homeStyles, siteStyles } from "../shared/ApplicationStyles";
 import { SignInEvents } from "./SignIn";
 
 
@@ -25,6 +25,7 @@ export default function SignInStub() {
               return;
         }
 
+        console.log("Stub signin success");
         DeviceEventEmitter.emit(SignInEvents.SIGN_IN_COMPLETE, { success: true, userInfo: user });
     }
 
@@ -35,7 +36,7 @@ export default function SignInStub() {
                 <Button onPress={() => handleClickUser(Test1)} mode="contained" style={ siteStyles.primaryButton }>Test 1</Button>
             </View>
             <View>
-                <Button onPress={() => handleClickUser(Test2)} mode="contained" style={ siteStyles.primaryButton }>Test 1</Button>
+                <Button onPress={() => handleClickUser(Test2)} mode="contained" style={ siteStyles.primaryButton }>Test 2</Button>
             </View>
         </View>
     )

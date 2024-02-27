@@ -1,14 +1,14 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { Firestore } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { DeviceEventEmitter, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { DeviceEventEmitter, SafeAreaView, ScrollView, View } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import { AnimatedFAB, Text } from "react-native-paper";
 import { AppContext } from "../AppContext";
+import { Sharing, initialContext } from "../Types";
+import { crudListStyles } from "../shared/ApplicationStyles";
 import { SwipeableItem, SwipeableItemEvents } from "../shared/SwipeableItem";
 import { deleteConnectionByEmail, findAllConnections } from "./ConnectionsService";
-import { crudListStyles } from "../shared/ApplicationStyles";
-import { Swipeable } from "react-native-gesture-handler";
-import { Sharing, initialContext } from "../Types";
 
 export default function ListConnections({ route, navigation }: any) {
     const appContext = useContext(AppContext);
@@ -36,7 +36,8 @@ export default function ListConnections({ route, navigation }: any) {
                     onLoad();
                 }
 
-            }, [route.params])
+            }, [route.params]
+        )
     );
 
     async function onLoad(useContext: boolean = false) {

@@ -4,6 +4,7 @@ import { FirebaseUtils } from "../util/FirebaseUtils";
 import LoadingOverlay from "../util/LoadingOverlay";
 import { useEffect, useState } from "react";
 import { User } from "../Types";
+import SignInStub from "./SignInStub";
 
 export enum SignInEvents {
   SIGN_IN_COMPLETE = "event.onSignIn"
@@ -18,12 +19,6 @@ export default function SignIn({ route, navigation}: any) {
   const [state, setState] = useState(initialState)
 
   useEffect(() => {
-
-    if(FirebaseUtils.isLocal()) {
-      navigation.navigate("SignInStub");
-      return;
-    }
-
     attemptReSignIn();
     console.log('sign in');
   }, [])
@@ -95,10 +90,14 @@ export default function SignIn({ route, navigation}: any) {
   }
 
   let landingPage = null;
-  if(state.attemptingReSignin) {
-    landingPage = <LoadingOverlay></LoadingOverlay>
+  if(FirebaseUtils.isLocal()) {
+    landingPage = <SignInStub></SignInStub>
   } else {
-    landingPage = <Button title="Sign In" onPress={signIn}></Button>
+    if(state.attemptingReSignin) {
+      landingPage = <LoadingOverlay></LoadingOverlay>
+    } else {
+      landingPage = <Button title="Sign In" onPress={signIn}></Button>
+    }
   }
 
   return (

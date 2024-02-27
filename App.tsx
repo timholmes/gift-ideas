@@ -32,6 +32,7 @@ export default function App() {
     setupEnvironment();
     DeviceEventEmitter.addListener(SignOutEvents.SIGN_OUT_COMPLETE, (eventData) => { handleSignOut(eventData) })
     DeviceEventEmitter.addListener(SignInEvents.SIGN_IN_COMPLETE, (eventData) => { handleSignIn(eventData) })
+    DeviceEventEmitter.addListener(SignOutEvents.SIGN_OUT_COMPLETE, (eventData) => { handleSignOut(eventData) })  // not getting called in some stub scenarios
 
     return () => {
       DeviceEventEmitter.removeAllListeners();
@@ -86,9 +87,7 @@ export default function App() {
   function HomeStackScreen() {
     return (
       <HomeStack.Navigator>
-        <HomeStack.Screen name="Home" component={Home} options={{
-          headerShown: false
-        }} />
+        <HomeStack.Screen name="Home" component={Home} options={{ headerShown: false, headerTitle: "" }}/>
       </HomeStack.Navigator>
     )
   }
@@ -135,7 +134,7 @@ export default function App() {
           component={HomeStackScreen}
           initialParams={state.userInfo}
           options={{
-            headerShown: false,
+            headerShown: true,
             tabBarLabel: 'Home',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="home" color={color} size={size} />
