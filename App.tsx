@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { DeviceEventEmitter, LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
-import { Test2 } from './spec/auth/StubUsers';
+import { Test2 } from './test/auth/StubUsers';
 import { AppContext } from './src/app/AppContext';
 import Home from './src/app/Home';
 import { initialContext } from './src/app/Types';

@@ -5,7 +5,7 @@ import { Firestore, connectFirestoreEmulator, getFirestore } from 'firebase/fire
 import { DeviceEventEmitter } from 'react-native';
 import firebaseConfig from '../../../firebase-config.json';
 import { SignInEvents } from '../auth/SignIn';
-import { Test1 } from '../../../spec/auth/StubUsers';
+import { Test1 } from '../../../test/auth/StubUsers';
 import { User } from '../Types';
 
 // TODO: we are mixing class and function constructs.  Need to refactor.

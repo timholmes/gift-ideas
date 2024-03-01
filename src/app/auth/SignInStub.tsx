@@ -1,6 +1,6 @@
 import { DeviceEventEmitter, View } from "react-native";
 import { Button, Text } from "react-native-paper";
-import { Test1, Test2 } from "../../../spec/auth/StubUsers";
+import { Test1, Test2 } from "../../../test/auth/StubUsers";
 import { User } from "../Types";
 import { siteStyles } from "../shared/ApplicationStyles";
 import { FirebaseUtils } from "../util/FirebaseUtils";
