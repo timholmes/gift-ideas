@@ -4,7 +4,7 @@ import { expectDatabasePermissionDenied, expectFirestorePermissionDenied, expect
 import { readFileSync, createWriteStream } from "node:fs";
 import { get } from "node:http";
 import { resolve } from 'node:path';
-import { doc, getDoc, setDoc, serverTimestamp, setLogLevel, collection, addDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, setLogLevel, collection, addDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { Idea } from '../src/app/Types';
 
 let testEnv: RulesTestEnvironment;
@@ -32,13 +32,19 @@ beforeEach(async () => {
 });
 
 describe("logged in user access", () => {
-    test('should be able to read anything without logging in', async function () {
+    test('should not be able to read anything without logging in', async function () {
 
         // Setup: Create documents in DB for testing (bypassing Security Rules).
         await testEnv.withSecurityRulesDisabled(async (context) => {
-            await addDoc(collection(context.firestore(), 'users', 'test1', 'ideas'), {
+            await addDoc(collection(context.firestore(), 'users', 'test1@email.com', 'ideas'), {
                 title: 'idea1',
                 description: 'desc1'
+            });
+        });
+
+        await testEnv.withSecurityRulesDisabled(async (context) => {
+            await addDoc(collection(context.firestore(), "users", "test1@email.com", "sharing"), { 
+                view: ['test2@email.com'] 
             });
         });
 
@@ -46,6 +52,8 @@ describe("logged in user access", () => {
 
         // try to access
         await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1')));
+        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1/ideas/title')));
+        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1/sharing/view')));
 
     });
 });
