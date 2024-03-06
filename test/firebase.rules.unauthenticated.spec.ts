@@ -1,11 +1,8 @@
-import { describe, test, beforeEach, beforeAll, afterAll, expect } from '@jest/globals';
-import { initializeTestEnvironment, RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { expectDatabasePermissionDenied, expectFirestorePermissionDenied, expectFirestorePermissionUpdateSucceeds, expectPermissionGetSucceeds, getFirestoreCoverageMeta } from './utils';
-import { readFileSync, createWriteStream } from "node:fs";
-import { get } from "node:http";
+import { RulesTestEnvironment } from '@firebase/rules-unit-testing';
+import { beforeAll, beforeEach, describe, test } from '@jest/globals';
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import { resolve } from 'node:path';
-import { doc, getDoc, setDoc, serverTimestamp, setLogLevel, collection, addDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { Idea } from '../src/app/Types';
+import { expectFirestorePermissionDenied, setupFirestore } from './utils';
 
 let testEnv: RulesTestEnvironment;
 const PROJECT_ID = 'fakeproject2';
@@ -13,18 +10,7 @@ const FIREBASE_JSON = resolve(__dirname, '../firebase.json');
 
 
 beforeAll(async () => {
-    // Silence expected rules rejections from Firestore SDK. Unexpected rejections
-    // will still bubble up and will be thrown as an error (failing the tests).
-    setLogLevel('error');
-    const { host, port } = getFirestoreCoverageMeta(PROJECT_ID, FIREBASE_JSON);
-    testEnv = await initializeTestEnvironment({
-        projectId: PROJECT_ID,
-        firestore: {
-            host,
-            port,
-            rules: readFileSync('firestore.rules', 'utf8')
-        },
-    });
+    testEnv = await setupFirestore();
 });
 
 beforeEach(async () => {

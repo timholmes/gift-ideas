@@ -1,5 +1,11 @@
-import { assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
+import { RulesTestEnvironment, assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { expect } from '@jest/globals';
+import { setLogLevel } from 'firebase/firestore';
+import { resolve } from 'node:path';
+import { readFileSync, createWriteStream } from "node:fs";
+
+const PROJECT_ID = 'fakeproject2';
+const FIREBASE_JSON = resolve(__dirname, '../firebase.json');
 
 /**
  * The FIRESTORE_EMULATOR_HOST environment variable is set automatically
@@ -25,6 +31,21 @@ export function getFirestoreCoverageMeta(projectId: string, firebaseJsonPath: st
     port,
     coverageUrl,
   }
+}
+
+export async function setupFirestore(): Promise<RulesTestEnvironment> {
+  // Silence expected rules rejections from Firestore SDK. Unexpected rejections
+    // will still bubble up and will be thrown as an error (failing the tests).
+    setLogLevel('error');
+    const { host, port } = getFirestoreCoverageMeta(PROJECT_ID, FIREBASE_JSON);
+    return await initializeTestEnvironment({
+        projectId: PROJECT_ID,
+        firestore: {
+            host,
+            port,
+            rules: readFileSync('firestore.rules', 'utf8')
+        },
+    });
 }
 
 /**
