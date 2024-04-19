@@ -17,7 +17,7 @@ beforeEach(async () => {
     await testEnv.clearFirestore();
 });
 
-describe("logged in user access", () => {
+describe("unauthenticated user", () => {
     test('should not be able to read anything without logging in', async function () {
 
         // Setup: Create documents in DB for testing (bypassing Security Rules).
@@ -37,9 +37,10 @@ describe("logged in user access", () => {
         const unauthedDb = testEnv.unauthenticatedContext().firestore();
 
         // try to access
-        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1')));
-        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1/ideas/title')));
-        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1/sharing/view')));
+        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1@email.com')));
+        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1@email.com/ideas/title')));
+        await expectFirestorePermissionDenied(getDoc(doc(unauthedDb, 'users/test1@email.com/sharing/view')));
 
     });
+
 });
