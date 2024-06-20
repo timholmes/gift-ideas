@@ -4,7 +4,7 @@ import { setLogLevel } from 'firebase/firestore';
 import { resolve } from 'node:path';
 import { readFileSync, createWriteStream } from "node:fs";
 
-const PROJECT_ID = 'fakeproject2';
+const PROJECT_ID = 'gift-ideas-b1988';
 const FIREBASE_JSON = resolve(__dirname, '../firebase.json');
 
 /**

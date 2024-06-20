@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { expectFirestorePermissionDenied, setupFirestore } from './utils';
 
 let testEnv: RulesTestEnvironment;
-const PROJECT_ID = 'fakeproject2';
+const PROJECT_ID = 'gift-ideas-b1988';
 const FIREBASE_JSON = resolve(__dirname, '../firebase.json');
 
 
