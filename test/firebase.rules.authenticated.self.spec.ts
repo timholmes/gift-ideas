@@ -46,7 +46,7 @@ describe("authenticated user security permissions", () => {
         const db = testEnv.authenticatedContext(USER_IM_NOT_SHARING_WITH, {email: USER_IM_NOT_SHARING_WITH}).firestore();
         
         // not sure why I can't use util package, but when using it I get a false positive
-        const result = await assertFails(getDocs(collection(db, "user", MY_EMAIL, "ideas")))
+        const result = await assertFails(getDocs(collection(db, "users", MY_EMAIL, "ideas")))
         expect(result.code).toBe('permission-denied' || 'PERMISSION_DENIED');
     });
 

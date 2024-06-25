@@ -14,7 +14,7 @@ service cloud.firestore {
     match /users/{email}/ideas/{document=**} {
       
       allow read, write: if loggedInAndMine(email);
-      allow read: if request.auth != null && exists(/databases/$(database)/documents/users)
+      allow read: if request.auth != null && exists(/databases/$(database)/documents/users/aaa/canView)
     }
 
   }
